@@ -1,0 +1,56 @@
+package  ${packageName};
+
+import java.util.LinkedList;
+import java.util.Arrays;
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.Model;
+import com.jfinal.plugin.activerecord.Page;
+import com.yingmob.base.common.Pager;
+import com.yingmob.core.kit.SqlXmlKit;
+import com.yingmob.core.plugin.annotation.Table;
+
+@Table(tableName = "${tableName}")
+public class ${className}Model extends Model<${className}Model>{
+		 
+		private static final long serialVersionUID = 1L;
+		public static final ${className}Model dao = new ${className}Model();
+		 
+		public Page<${className}Model> page(Pager pager) {
+			LinkedList<Object> param = new LinkedList<Object>();
+			return dao.paginate(pager.getPageNo(), pager.getPageSize(), "select * ", SqlXmlKit.getSql("${className}.pager", pager.getParamsMap(), param), param.toArray());
+		}
+		 
+		public int batchDel(String ids){
+			 ids = Arrays.toString(ids.split("\\|"));
+			 ids = ids.replace("[", "(");
+			 ids  = ids.replace("]", ")");
+			 return Db.update("delete from ${tableName} where id in"+ids);
+		}
+		
+		public int batchAdd(String[] ...strings){
+			<%
+				var fds = "(";
+				for(field in fields){
+					fds= fds+field;
+				}
+				fds = fds+ ")";
+			%>
+			 StringBuilder sb = new StringBuilder("insert into ${tableName}${fds} values");
+			 for (int j = 0; j < strings[0].length; j++) {
+				 sb.append("(");
+				 for (int i = 0; i < strings.length; i++) {
+					 if(i==strings.length-1){
+						 sb.append(strings[i][j]);
+					 }else{
+						 sb.append(strings[i][j]+",");
+					 }
+				 }
+				 if(j==strings[0].length-1){
+					 sb.append(")");
+				 }else{
+					 sb.append("),");
+				 }
+			 }
+			 return Db.update(sb.toString());
+		 }
+}

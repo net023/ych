@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>${reportName}</title>
+<% include("/pager/common/quote.html"){} %>
+</head>
+<body>
+<div class="body-center">
+	 <div class="html-panel query-panel" id="query_con">
+		 <div class="panel-header"><div class="panel-title">查询条件</div></div>
+		  <div class="panel-content" id="menuMgrPanel">
+			 <form onsubmit="return false;" id="queryForm" class="form_style">
+				 <span class="spacing">
+					 <input type="submit" id="queryButton" value="查询"/>
+				 </span>
+				 <span class="spacing">
+					 <input type="button" id="export" value="导出">
+				 </span>
+			 </form>
+		 </div>
+	 </div>
+	   
+	 <table id="grid" data-options="rownumbers:true,pagination:true,url:'${controllerKey}/list'" title="${reportName}">
+		 <thead>
+			 <%if(fields.~size>0){
+				 	for(field in fields){%>
+				 		<th data-options="field:'${field}',width:160,resizable:true,align:'left'">${field}</th>
+				<% 	}
+			 	}else{%>
+			 		<th data-options="field:'ex1',width:160,resizable:true,align:'left'">示例1</th>
+			 	<%}%>
+			 <th data-options="field:'opt',width:160,resizable:true,align:'left',export:0,formatter:formatter.opt">操作</th>
+		 </thead>
+	 </table>
+	 
+	 <div class="hide-panel">
+	        <div id="${controllerKey}Dialog" style="width:500px;height:300px;padding-left:50px;" data-options="resizable:false,modal:true,closed: true">
+	            <form id="${controllerKey}Form" class="form_style" method="post" onsubmit="return false;">
+	                <input type="hidden" name="id" id="id" />
+	                <%if(fields.~size>0){
+					 	for(field in fields){%>
+					 		<div class="form-field">
+			                    <label for="edit_${field}">${field}<font color="red">*</font></label>
+			                    <input class="easyui-validatebox" type="text" name="${field}" id="edit_${field}"  data-options="required:true" />
+			                </div>
+					<% 	}
+				 	}else{%>
+				 		<div class="form-field">
+		                    <label for="edit_ex1">示例1：<font color="red">*</font></label>
+		                    <input class="easyui-validatebox" type="text" name="ex1" id="edit_ex1"  data-options="required:true" />
+		                </div>
+				 	<%}%>
+	            </form>
+		   </div>
+	   </div>
+	 
+</div>
+</body>
+</html>

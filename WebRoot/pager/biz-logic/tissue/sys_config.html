@@ -1,0 +1,61 @@
+<#compress>
+<!DOCTYPE html>
+<html>
+<head>
+<title>数据字典表</title>
+<% include("/pager/common/quote.html"){} %>
+</head>
+<body>
+    <div class="body-center">
+        <div class="html-panel query-panel" id="query_con">
+            <div class="panel-header"><div class="panel-title">查询条件</div></div>
+            <div class="panel-content" id="menuMgrPanel">
+                <form onsubmit="return false;" id="queryForm" class="form_style">
+                    <span class="spacing"><label>字典ID：</label><input type="text" name="key"/></span>
+                    <span class="spacing"><label>状态：</label><select name="state"><option value="">==请选择==</option><option value="1">正常</option><option value="0">停用</option></select></span>
+                    <span class="spacing"><input type="submit" id="queryButton" value="查询"/></span>
+                </form>
+            </div>
+        </div>
+        <table id="grid" data-options="url:'config/list'" title="数据字典">
+            <thead>
+                <th data-options="field:'key',width:100,resizable:true,align:'left'">字典ID</th>
+                <th data-options="field:'field',width:120,resizable:true,align:'left'">字典KEY</th>
+                <th data-options="field:'val',width:120,resizable:true,align:'left'">VALUE值</th>
+                <th data-options="field:'state',width:80,resizable:true,align:'left',formatter:formatter.state">状态</th>
+                <th data-options="field:'remark',width:200,resizable:true,align:'left'">备注</th>
+                <th data-options="field:'opt',width:80,resizable:true,align:'center',formatter:formatter.opt">操作</th>
+            </thead>
+        </table>
+    </div>
+    <div class="hide-panel">
+        <div id="editDialog" style="width:500px;height:300px;padding-left:50px;" data-options="resizable:false,modal:true,closed: true">
+            <form id="editForm" class="form_style" method="post" onsubmit="return false;">
+                <input type="hidden" name="id" id="id" />
+                <div class="form-field">
+                    <label for="edit_key">字典ID：<font color="red">*</font></label>
+                    <input class="easyui-validatebox" type="text" name="key" id="edit_key" maxlength="30" data-options="required:true" />
+                </div>
+                <div class="form-field">
+                    <label for="edit_key">KEY：<font color="red">*</font></label>
+                    <input class="easyui-validatebox" type="text" name="field" id="edit_field" maxlength="30" data-options="required:true"/>
+                </div>
+                <div class="form-field">
+                    <label for="edit_val">VALUE值：<font color="red">*</font></label>
+                    <input class="easyui-validatebox" type="text" name="val" id="edit_val" maxlength="50" data-options="required:true"/>
+                </div>
+                <div class="form-field">
+                    <label for="edit_remark">备注：<font color="red"></font></label>
+                    <textarea name="remark" id="edit_remark" style="width:280px;height:65px;resize:none;" maxlength="250"></textarea>
+                </div>
+                <div class="form-field">
+                    <label for="state">状态：<font color="red">*</font></label>
+                    <input type="radio" name="state" value="1" checked="checked" /><span class="check-label">正常</span>
+                       <input type="radio" name="state" value="0" /><span  class="check-label">停用</span>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+</#compress>

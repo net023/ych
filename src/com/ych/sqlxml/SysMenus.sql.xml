@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sql-statement namespace="SysMenus">
+	
+	<!-- 动态SQL处理 -->
+	<sql id="listMenuByUserID">
+		<![CDATA[ 
+			SELECT DISTINCT
+				sm.*
+			FROM
+				sys_user_role u
+			LEFT JOIN sys_roles r ON u.roleID = r.id
+			LEFT JOIN sys_role_menu m ON r.id = m.roleID
+			LEFT JOIN sys_menus sm ON m.menuID = sm.id
+			LEFT JOIN sys_menus psm ON sm.parentID = psm.id
+			WHERE
+				sm.`status` = 1
+			AND 
+				u.userID = ?
+			ORDER BY
+				CASE sm.isParent WHEN 1 THEN sm.sort ELSE psm.sort END,
+				CASE sm.isParent WHEN 1 THEN sm.id ELSE sm.parentID END,
+				sm.isParent DESC,
+				sm.sort
+    	]]>
+	</sql>
+
+</sql-statement>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sqlGroup namespace="${className}">
+	 <sql id="pager">
+		 <![CDATA[
+		 	<%
+				var sql_fields = "";
+				for(field in fields){
+					if(fieldLP.index==fieldLP.size){
+						sql_fields=sql_fields+field;
+					}else{
+						sql_fields=sql_fields+field+",";
+					}
+				}
+			%>
+			 FROM(
+				 select ${sql_fields} from ${tableName}
+			 )t
+		 ]]>
+	 </sql>
+</sqlGroup>

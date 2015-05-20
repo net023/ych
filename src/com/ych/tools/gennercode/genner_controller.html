@@ -1,0 +1,125 @@
+package  ${packageName};
+		
+import com.yingmob.base.common.BaseController;
+<%
+	var modePackage = "";
+	modePackage = strutil.subStringTo(packageName,0,strutil.length(packageName)-10)+"model";
+%>
+import ${modePackage}.${className}Model;
+import com.jfinal.log.Logger;
+import com.jfinal.aop.Before;
+import com.jfinal.plugin.activerecord.tx.Tx;
+import java.util.Map;
+import com.yingmob.core.plugin.annotation.Control;
+import com.yingmob.base.common.Pager;
+import com.jfinal.plugin.activerecord.Page;
+		
+@Control(controllerKey = "/${controllerKey}")
+public class ${className}Controller extends BaseController{
+		
+		private static final Logger LOG = Logger.getLogger(${className}Controller.class);
+		
+		public void index() {
+			<%
+				var str = "";
+				if(strutil.contain(className,"Report")||strutil.contain(className,"report")){
+					str = "report/"+controllerKey;
+				}else{
+					str = controllerKey+"/"+controllerKey;
+				}
+			%>
+			 render("${str}");
+		}
+		
+		public void list() {
+			 Pager pager = createPager();
+			 Page<${className}Model> page = ${className}Model.dao.page(pager);
+			 setAttr("total", page.getTotalRow());
+			 setAttr("rows", page.getList());
+			 renderJson();
+		}
+		
+		public void export() {
+			 Pager pager = createPager(999999, 1);
+			 Page<${className}Model> page = ${className}Model.dao.page(pager);
+			 renderXLS(page.getList(), null, null);
+		}
+		
+		@Before(Tx.class)
+		public void add() {
+			 Map<String, Object> result = getResultMap();
+			 try {
+				${className}Model ${controllerKey} = getModelWithOutModelName(${className}Model.class, true);
+				${controllerKey}.save();
+				result.put(RESULT, true);
+				result.put(MESSAGE, "添加成功!");
+			 } catch (Exception e) {
+				LOG.debug("${className}添加失败！" + e.getMessage());
+				result.put(RESULT, false);
+				result.put(MESSAGE, "添加失败！");
+			 }
+			 renderJson(result);
+		}
+		
+		@Before(Tx.class)
+		public void update() {
+		 Map<String, Object> result = getResultMap();
+		 try {
+			${className}Model ${controllerKey} = getModelWithOutModelName(${className}Model.class, true);
+			${controllerKey}.update();
+			result.put(RESULT, true);
+			result.put(MESSAGE, "更新成功！");
+		 } catch (Exception e) {
+			LOG.debug("${className}更新失败！" + e.getMessage());
+			result.put(RESULT, false);
+			result.put(MESSAGE, "更新失败！");
+		 }
+		 renderJson(result);
+		}
+		
+		@Before(Tx.class)
+		public void batchAdd() {
+		 Map<String, Object> result = getResultMap();
+		 String[] ex1 = getParaValues("ex1");
+		 String[] ex2 = getParaValues("ex2");
+		 String[] ex3 = getParaValues("ex3");
+		 try {
+			${className}Model.dao.batchAdd(ex1,ex2,ex3);
+			result.put(RESULT, true);
+			result.put(MESSAGE,"批量添加成功!");
+		 } catch (Exception e) {
+			LOG.debug("${className}批量添加失败！" + e.getMessage());
+			result.put(RESULT, false);
+			result.put(MESSAGE, "批量添加失败!");
+		 }
+		 renderJson(result);
+		}
+			
+		@Before(Tx.class)
+		public void batchDel() {
+		 Map<String, Object> result = getResultMap();
+		 try {
+			${className}Model.dao.batchDel(getPara("ids"));
+			result.put(RESULT, true);
+			result.put(MESSAGE, "批量删除成功！");
+		 } catch (Exception e) {
+			LOG.debug("${className}批量删除失败！" + e.getMessage());
+			result.put(RESULT, false);
+			result.put(MESSAGE, "批量删除失败！");
+		 }
+		 renderJson(result);
+		}
+		
+		@Before(Tx.class)
+		public void modify(){
+			Integer id = getParaToInt("id");
+			Integer state = getParaToInt("state");
+			${className}Model model = ${className}Model.dao.findById(id);
+			model.set("state",state);
+			Boolean b = model.update();
+			Map<String, Object> result = getResultMap();
+			result.put(RESULT, b);
+			result.put(MESSAGE, b ? "保存成功" : "保存失败，请联系管理员！");
+			renderJson(result);
+		}
+}

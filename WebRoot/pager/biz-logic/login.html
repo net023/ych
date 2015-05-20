@@ -1,0 +1,56 @@
+<#compress>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>悦车汇 - 登录</title> 
+<% include("/pager/common/quote.html"){} %>
+<style type="text/css">
+
+</style>
+</head>
+
+<body>
+    <div id="box-center">
+        <div class="box-center-lef">
+            <img src="${base}/assets/biz-logic/images/zuobian_01.jpg" />
+        </div>
+        <div class="box-center-cen">
+            <div class="tw">
+                <div class="tu">
+                    <img src="${base}/assets/biz-logic/images/qium2_03.jpg" />
+                </div>
+                <div class="wen">
+                    <form id="loginForm" action="login/loginCheck" method="post" onsubmit="return false;">
+                        <div id="wen-top">
+                            <div id="ming">用户名</div>
+                            <div id="kuang">
+                                <input type="text" name="username" maxlength="25" id="username" />
+                            </div>
+                        </div>
+                        <div id="wen-dow">
+                            <div id="mima">密&nbsp;&nbsp;码</div>
+                            <div id="mikuang">
+                                <input type="password" name="password" maxlength="25" id="password" />
+                            </div>
+                            <div id="login">
+                                <span class="login1">
+                                    <input type="submit" class="submit" id="submit" value="" />
+                                </span>
+                                <span class="login2">
+                                    <input type="reset" class="reset" id="reset"  value="" />
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+        <div class="box-cneter-rig">
+            <img src="${base}/assets/biz-logic/images/youbian_01.jpg" />
+        </div>
+    </div>
+</body>
+</html>
+</#compress>

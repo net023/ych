@@ -1,0 +1,17 @@
+package  ${packageName};
+
+import com.jfinal.core.Controller;
+import com.jfinal.validate.Validator;
+
+public class ${className}Validator extends Validator{
+	 @Override
+	 protected void validate(Controller controller) {
+	 	validateRequired("", "", "");
+	 }
+	   
+	 @Override
+	 protected void handleError(Controller c) {
+		 addError("isok", "false");
+		 c.renderJson();
+	 }
+}

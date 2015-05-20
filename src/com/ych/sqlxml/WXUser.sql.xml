@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sqlGroup namespace="WXUser">
+	
+	<!-- 动态SQL处理 -->
+	<sql id="pager">
+		<![CDATA[ 
+			from(
+				select `name`,openid,c_time,phone from user where 1=1
+				<% if(!isEmpty(startDate)){ %>
+					AND c_time>=#'$startDate$'#
+				<% } %>
+				<% if(!isEmpty(endDate)){ %>
+				 AND c_time<DATE_ADD(#'$endDate$'#,INTERVAL 1 DAY)
+				<% } %>
+				<% if(!isEmpty(openID)){ %>
+				 AND openid = #'$openID$'#
+				<% } %>
+			)t order by t.c_time
+		]]>
+	</sql>
+	
+</sqlGroup>

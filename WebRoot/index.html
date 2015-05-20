@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>QQ JS省市区三级联动</title>
+<!-- 使用QQ的省市区数据 -->
+<!--
+<script type="text/javascript" src="http://ip.qq.com/js/geo.js"></script>
+-->
+<script type="text/javascript" src="jquery-1.8.2.min.js"></script>
+<script type="text/javascript" src="geo.js"></script>
+<script type="text/javascript" src="jquery.json.js"></script>
+<script type="text/javascript">
+	$(function(){
+		$("#btn1").click(function(){
+			var dd = $.toJSON(dsy);
+			$.post(
+				"wx_user/parseJson",
+				{d:dd},
+				function(data){
+					alert(data);
+				}
+			);
+		});
+	});
+</script>
+</head>
+<body onload="setup();preselect('陕西省');promptinfo();">
+        <form name="shareip" action="/cgi-bin/feedback" method="post">
+			<select class="select" name="province" id="s1">
+			  <option></option>
+			</select>
+			<select class="select" name="city" id="s2">
+			  <option></option>
+			</select>
+			<select class="select" name="town" id="s3">
+			  <option></option>
+			</select>
+			<input id="address" name="address" type="hidden" value="" />
+		  <input onclick="alert(document.getElementById('address').value);console.info(dsy);console.log($.toJSON(dsy)); return false;" type="submit" value="提交" />
+        </form>
+        <br>
+        <br>
+        <br>
+        <button id="btn1">导入</button>
+<script>
+function promptinfo()
+{
+	var address = document.getElementById('address');
+	var s1 = document.getElementById('s1');
+	var s2 = document.getElementById('s2');
+	var s3 = document.getElementById('s3');
+	address.value = s1.value + s2.value + s3.value;
+}
+
+</script>
+</body>
+</html>
