@@ -15,7 +15,7 @@
                 <form onsubmit="return false;" id="queryForm" class="form_style">
                 		<span class="spacing">
                 			<label>门店名称：</label>
-                			<input type="text" name="name">
+                			<input type="text" name="storeName">
                 		</span>
                     <span class="spacing"><input type="submit" id="queryButton" value="查询"/></span>
                 </form>
@@ -24,7 +24,17 @@
         
         <table id="grid"  data-options="rownumbers:true,pagination:true,url:'store/list'" title="门店列表">
             <thead>
+            	<th data-options="field:'id',hidden:true">ID</th>
                 <th data-options="field:'name',width:80,resizable:true,align:'left'">门店名称</th>
+            	<th data-options="field:'address',hidden:true">address</th>
+            	<th data-options="field:'info',hidden:true">info</th>
+            	<th data-options="field:'lon',hidden:true">lon</th>
+            	<th data-options="field:'lat',hidden:true">lat</th>
+            	<th data-options="field:'province',hidden:true">province</th>
+            	<th data-options="field:'city',hidden:true">city</th>
+            	<th data-options="field:'county',hidden:true">county</th>
+            	<th data-options="field:'fs',hidden:true">fs</th>
+            	<th data-options="field:'ms',hidden:true">ms</th>
                 <th data-options="field:'c_time',width:80,resizable:true,align:'left'">创建时间</th>
                 <th data-options="field:'opt',width:80,resizable:true,align:'center',formatter:formatter.opt">操作</th>
             </thead>
@@ -98,7 +108,7 @@
                 <div class="form-field">
                     <label for="current">保养服务：<font color="red">*</font></label>
                     <%for(mtSer in allMtSers) {%>
-                    	<input type="checkbox" name="ms" value="${mtSer.id}">${mtSer.name}
+                    	<input type="checkbox" name="ms" value="${mtSer.id}" id="ms_${mtSer.id}">${mtSer.name}
                    	<%}%>
                 </div>
                  <div class="form-field">

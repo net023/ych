@@ -1,7 +1,9 @@
 package com.ych.web.model;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Model;
 import com.jfinal.plugin.activerecord.Page;
 import com.ych.base.common.Pager;
@@ -24,4 +26,14 @@ public class StoreModel extends Model<StoreModel> {
 				SqlXmlKit.getSql("Store.pager", pager.getParamsMap(), param),
 				param.toArray());
 	}
+	
+	
+	public int batchDel(String ids){
+		 ids = Arrays.toString(ids.split("\\|"));
+		 ids = ids.replace("[", "(");
+		 ids  = ids.replace("]", ")");
+		 return Db.update("delete from store where id in"+ids);
+	 }
+	
+	
 }

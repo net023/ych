@@ -5,10 +5,18 @@
 	<sql id="pager">
 		<![CDATA[ 
 			from(
-				select `name`,c_time from store where 1=1
-				<% if(!isEmpty(storeName)){ %>
-				 AND name like #'%$storeName$%'#
-				<% } %>
+				select t1.*,t2.fs,t3.ms from(
+					select id,`name`,address,info,lon,lat,c_time,province,city,county from store where 1=1
+					<% if(!isEmpty(storeName)){ %>
+					 AND name like #'%$storeName$%'#
+					<% } %>
+				)t1
+				left join(
+					select s_id,REPLACE(group_concat(f_id),',','|') 'fs' from  store_pic group by s_id
+				)t2 on t2.s_id = t1.id
+				left join(
+					select s_id,group_concat(ms_id) 'ms' from store_mtser group by s_id
+				)t3 on t3.s_id = t1.id
 			)t order by t.c_time
 		]]>
 	</sql>

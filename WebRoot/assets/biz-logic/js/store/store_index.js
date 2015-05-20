@@ -2,14 +2,14 @@ var files = new Array();
 /** 
 *删除数组指定下标或指定对象 
 */ 
-Array.prototype.remove=function(obj){ 
+/*Array.prototype.remove=function(obj){ 
 	for(var i =0;i <this.length;i++){ 
 		var temp = this[i]; 
 		if(temp==obj){
 			this.splice(i,1);
 		}
 	} 
-}; 
+}; */
 $(function() {
 	$("#city").combobox({
 		onLoadSuccess:function(data){
@@ -189,7 +189,7 @@ $(function() {
             {field:'ck',checkbox:true}
         ]],
         toolbar : [{
-                    text : '添加版本',
+                    text : '添加门店',
                     iconCls : 'icon-add',
                     handler : handler_add
                 }, '-', {
@@ -209,7 +209,11 @@ $(function() {
         $('#editForm').attr('action','store/add').resetForm();
         $('#id').val('');
         $("#picNode").empty();
-        $('#editDialog').dialog('open').dialog("setTitle","添加新版本");
+        files = new Array();
+        $('input:checkbox').each(function () {
+            $(this).attr('checked',false);
+        });
+        $('#editDialog').dialog('open').dialog("setTitle","添加门店");
         
         //选择第一个
         var val = $("#province").combobox("getData");
@@ -227,13 +231,13 @@ $(function() {
     function batch_del() {
         var check = $('#grid').datagrid('getChecked');
         if(check.length > 0){
-            $.messager.confirm('操作提示', '确定要删除所选版本？', function(r){
+            $.messager.confirm('操作提示', '确定要删除所选门店？', function(r){
                 if (r){
                     var ids = new Array();
                     for(var i in check){
                         ids[i] = check[i].id;
                     }
-                    $._ajaxPost('version/batchDel',{ids:ids.join('|')},function(r){
+                    $._ajaxPost('store/batchDel',{ids:ids.join('|')},function(r){
                         if(r.r){$('#grid').datagrid('reload');}else{$.messager.alert('操作提示', r.m,'error');}
                     });
                 }
@@ -243,18 +247,6 @@ $(function() {
     
 });
 var formatter = {
-	current : function(value, rowData, rowIndex) {
-		if(value == 1) return '是';
-		else if(value == 0) return '否';
-		else 
-			return '';
-		
-    },
-    type : function(value , rowData , rowIndex){
-    	if(value == '0') return '应用';
-    	else if(value == '1') return '更新程序';
-    	else return '';
-    },
     opt : function(value, rowData, rowIndex) {
         var html = '<a class="spacing a-blue" onclick="updVersion('+rowIndex+');" href="javascript:void(0);">修改</a>';
             html+= '<a class="spacing a-red" onclick="delVersion('+rowIndex+');" href="javascript:void(0);">删除</a>';
@@ -265,17 +257,54 @@ var formatter = {
 
 /*修改版本*/
 function updVersion(rowIndex) {
-    $('#editForm').attr('action','version/update').resetForm();
+    $('#editForm').attr('action','store/update').resetForm();
     var data = $('#grid').datagrid('getRows')[rowIndex];
     $('#editForm')._jsonToForm(data);
-    $('#editDialog').dialog('open').dialog('setTitle','修改版本');
+    $('#editDialog').dialog('open').dialog('setTitle','修改门店');
+    $("#picNode").empty();
+    $('input:checkbox').each(function () {
+        $(this).attr('checked',false);
+    });
+    //填补省市联动
+    updataHandler(data);
 }
 
-/*删除版本*/
+
+function updataHandler(data){
+	$("#province").combobox("select",data.province);
+	$("#city").combobox("select",data.city);
+	$("#county").combobox("select",data.county);
+	
+	//checkbox checked
+	if(data.ms){
+		var ms = data.ms.split(",");
+		for(var item in ms){
+			$("#ms_"+ms[item]).attr("checked",'true');
+		}
+	}
+	
+	//show img
+	if(data.fs){
+		var fs = data.fs.split("|");
+		files = fs;
+		for(var item in fs){
+			var html = '<td id="f_'+fs[item]+'"><image src="file/download?fID='+fs[item]+'" style="width:80px;height:80px"/><a href="javascript:;" onclick="delFile('+fs[item]+')">删除</a></td>';
+			$("#picNode").append(html);
+		}
+	}
+	
+}
+
+
+/*删除门店*/
 function delVersion(rowIndex) {
     var data = $('#grid').datagrid('getRows')[rowIndex];
-    $._ajaxPost('version/batchDel',{ids:data.id},function(r){
-        if(r.r){$('#grid').datagrid('reload');}else{$.messager.alert('操作提示', r.m,'error');}
+    $.messager.confirm('操作提示', '确定要删除所选门店？', function(r){
+        if (r){
+        	$._ajaxPost('store/batchDel',{ids:data.id},function(r){
+        		if(r.r){$('#grid').datagrid('reload');}else{$.messager.alert('操作提示', r.m,'error');}
+        	});
+        }
     });
 }
 
@@ -286,11 +315,21 @@ function delFile(fid){
         	$.messager.alert("删除完成",r.m);
         	$('#f_'+fid).remove();
         	console.info(files);
-        	files.remove(fid);
+//        	files.remove(fid);
+        	removeArrElement(files,fid);
         	console.info(files);
         }else{
         	$.messager.alert('删除失败', r.m,'error');
         }
     });
 	return false;
+}
+
+function removeArrElement(arr,obj){
+	for(var i=0;i<arr.length;i++){
+		var temp = arr[i]; 
+		if(temp==obj){
+			arr.splice(i,1);
+		}
+	}
 }
