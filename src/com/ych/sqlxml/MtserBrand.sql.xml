@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sqlGroup namespace="MtserBrand">
+	
+	<!-- 动态SQL处理 -->
+	<sql id="pager">
+		<![CDATA[ 
+		from(
+			select ms_id, f_ms_id, s_ms_id, first_category, brand_filter, second_category from(
+				select ms_id, group_concat(brand_filter) brand_filter from mtser_brand_filter group by ms_id
+			)t1 inner join(
+				select `id` f_ms_id, p_id, `name` first_category, null s_ms_id, null second_category from mtser
+			)t2 on t1.ms_id = t2.f_ms_id and t2.p_id is null
+			union all(
+				select ms_id, f_ms_id, s_ms_id, first_category, brand_filter, second_category from(
+					select ms_id, group_concat(brand_filter) brand_filter from mtser_brand_filter group by ms_id
+				)t4 inner join(
+					select `id` s_ms_id, p_id, `name` second_category from mtser
+				)t5 on t4.ms_id = t5.s_ms_id and t5.p_id is not null
+				inner join(
+					select `id` f_ms_id, `name` first_category from mtser
+				)t6 on t5.p_id = t6.f_ms_id
+			)
+		)t order by t.ms_id
+		]]>
+	</sql>
+	
+</sqlGroup>
