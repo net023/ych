@@ -12,12 +12,11 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.jfinal.aop.Before;
+import com.jfinal.kit.FileKit;
 import com.jfinal.kit.JsonKit;
 import com.jfinal.log.Logger;
-import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.tx.Tx;
-import com.jfinal.plugin.ehcache.CacheKit;
 import com.jfinal.upload.UploadFile;
 import com.ych.base.common.BaseController;
 import com.ych.base.common.Pager;
@@ -96,6 +95,9 @@ public class NewsController extends BaseController {
 			NewsModel qm = NewsModel.dao.findById(id);
 			
 			String html = getPara("n_content");
+			
+			delIMgHandler(qm.getStr("n_content"), html);
+			
 			Document doc = Jsoup.parseBodyFragment(html);
 			Elements imgs = doc.select("img");
 			System.out.println(imgs.size());
@@ -122,11 +124,61 @@ public class NewsController extends BaseController {
 		}
 		renderJson(result);
 	}
+	
+	
+	private void delIMgHandler(String old,String now){
+		Document old_doc = Jsoup.parseBodyFragment(old);
+		Document now_doc = Jsoup.parseBodyFragment(now);
+		Elements old_imgs = old_doc.select("img");
+		Elements now_imgs = now_doc.select("img");
+		List<String> old_src = new ArrayList<String>();
+		List<String> now_src = new ArrayList<String>();
+		for (Element element : old_imgs) {
+			if(element.attr("src").indexOf("emot")==-1){
+				String src = element.attr("src");
+				old_src.add(src);
+			}
+		}
+		for (Element element : now_imgs) {
+			if(element.attr("src").indexOf("emot")==-1){
+				String src = element.attr("src");
+				now_src.add(src);
+			}
+		}
+		List<String> temp_old_src = new ArrayList<String>(old_src);
+		//交集
+		old_src.retainAll(now_src);
+		if(old_src.size()<temp_old_src.size()){
+			//差集
+			temp_old_src.removeAll(old_src);
+			//删除图片
+			String rootRealPath = this.getRequest().getServletContext().getRealPath("/");
+			for (String img : temp_old_src) {
+				FileKit.delete(new File(rootRealPath,img));
+			}
+		}
+	}
+	
 
 	@Before(Tx.class)
 	public void batchDel() {
 		Map<String, Object> result = getResultMap();
 		try {
+			//删除图片
+			String rootRealPath = this.getRequest().getServletContext().getRealPath("/");
+			String[] ids = getPara("ids").split("\\|");
+			for (String idStr : ids) {
+				String content = NewsModel.dao.findById(Integer.valueOf(idStr)).getStr("n_content");
+				Document doc = Jsoup.parseBodyFragment(content);
+				Elements imgs = doc.select("img");
+				for (Element img : imgs) {
+					if(img.attr("src").indexOf("emot")==-1){
+						String src = img.attr("src");
+						FileKit.delete(new File(rootRealPath,src));
+					}
+				}
+			}
+			
 			NewsModel.dao.batchDel(getPara("ids"));
 			result.put(RESULT, true);
 			result.put(MESSAGE, "news批量删除成功！");

@@ -2,6 +2,7 @@ package com.ych.web.model;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Model;
@@ -33,6 +34,16 @@ public class NewsModel extends Model<NewsModel> {
 		ids = ids.replace("]", ")");
 		return Db.update("delete from news where n_type in" + ids);
 	}
+	
+	
+	public List<NewsModel> getByType(String ids){
+		ids = Arrays.toString(ids.split("\\|"));
+		ids = ids.replace("[", "(");
+		ids = ids.replace("]", ")");
+		String sql = "select n_content from news where n_type in "+ids;
+		return this.find(sql);
+	}
+	
 
 	public int batchDel(String ids) {
 		ids = Arrays.toString(ids.split("\\|"));
