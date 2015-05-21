@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sql-statement namespace="NewsClass">
+	 <sql id="pager">
+		 <![CDATA[
+			 FROM(
+				 select t1.*,t2.num from news_type t1 left join(select n_type,count(id) num from news group by n_type)t2 on t2.n_type = t1.id
+			 )t
+		 ]]>
+	 </sql>
+</sql-statement>

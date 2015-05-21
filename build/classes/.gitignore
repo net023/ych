@@ -1,9 +1,1 @@
 /com/
-/dbConfig.properties
-/dev.properties
-/dev_dbConfig.properties
-/dev_sysConfig.properties
-/ehcache.xml
-/log4j.properties
-/quartzjob.properties
-/sysConfig.properties

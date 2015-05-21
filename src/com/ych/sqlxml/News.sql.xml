@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sql-statement namespace="News">
+	 <sql id="pager">
+		 <![CDATA[
+			 FROM(
+				 select t0.*,t1.t_name typeName from news t0
+				 join(
+				 	select id,t_name from news_type where 1=1
+				 	<%if(!isEmpty(n_type)){%>
+					 	and id = #$n_type$#
+					<%}%>
+				 )t1 on t1.id = t0.n_type
+				 where 1=1
+				 <%if(!isEmpty(n_title)){%>
+				 	and `n_title` like #'%$n_title$%'#
+				 <%}%>
+				 order by t0.c_time
+			 )t
+		 ]]>
+	 </sql>
+</sql-statement>

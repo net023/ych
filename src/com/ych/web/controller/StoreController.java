@@ -6,11 +6,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.jfinal.aop.Before;
 import com.jfinal.kit.FileKit;
 import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.StrKit;
 import com.jfinal.log.Logger;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.tx.Tx;
 import com.ych.base.common.BaseController;
 import com.ych.base.common.Pager;
 import com.ych.core.plugin.annotation.Control;
@@ -57,6 +59,7 @@ public class StoreController extends BaseController {
 		renderJson();
 	}
 
+	@Before(Tx.class)
 	public void add() {
 		Map<String, Object> result = getResultMap();
 		try {
@@ -89,6 +92,7 @@ public class StoreController extends BaseController {
 		renderJson(result);
 	}
 
+	@Before(Tx.class)
 	public void update() {
 		Map<String, Object> result = getResultMap();
 		try {
@@ -126,6 +130,7 @@ public class StoreController extends BaseController {
 		renderJson(result);
 	}
 
+	@Before(Tx.class)
 	public void batchDel() {
 		Map<String, Object> result = getResultMap();
 		try {

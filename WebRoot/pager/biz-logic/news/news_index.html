@@ -1,0 +1,139 @@
+<#compress>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>文章</title>
+<% include("/pager/common/quote.html"){} %>
+<script type="text/javascript" src="${base}/assets/common/xheditor/xheditor-1.2.1.min.js"></script>
+<script type="text/javascript" src="${base}/assets/common/xheditor/xheditor_lang/zh-cn.js"></script>
+<script type="text/javascript">
+	$(function(){
+		var editor = $('#answer').xheditor({
+			tools:'Cut,Copy,Paste,Pastetext,Blocktag,Fontface,FontSize,Bold,Italic,Underline,Strikethrough,FontColor,BackColor,SelectAll,Removeformat,Align,List,Outdent,Indent,Link,Unlink,Anchor,Img,Hr,Emot,Table,Source,Preview,Fullscreen',
+			upMultiple:1,
+			html5Upload:false,
+			upImgUrl: "!news/upimgByIframe",  
+            upImgExt: "jpg,jpeg,gif,bmp,png"
+		});
+		
+		
+		/* $("#ddd").click(function(){
+			editor.showIframeModal("title","http://www.baidu.com",aaa,400,200);
+		});
+		
+		function aaa(){
+			alert(1);
+		} */
+	});
+</script>
+</head>
+<body>
+<div class="body-center">
+	 <div class="html-panel query-panel" id="query_con">
+		 <div class="panel-header"><div class="panel-title">查询条件</div></div>
+		  <div class="panel-content" id="menuMgrPanel">
+			  <form onsubmit="return false;" id="queryForm" class="form_style">
+	        		<span class="spacing">
+	        			<label>文章名称:</label>
+	        			<input name="n_title" type="text" placeholder="请输入文章名称">
+	        		</span>
+	        		<span class="spacing">
+                    	<label>文章类型:</label>
+                    	<input name="n_type" class="easyui-combobox" data-options="
+						editable:false,
+						required:false,
+				        valueField:'id',
+				        textField:'t_name',
+				        data:${newsClass1}"
+				        style="width: 155px;">
+                    </span>
+	             <span class="spacing">
+	             	<input type="submit" id="queryButton" value="查询"/>
+	             </span>
+	         </form>
+		 </div>
+	 </div>
+	   
+	 <table id="grid" data-options="rownumbers:true,pagination:true,url:'news/list'" title="文章列表">
+		 <thead>
+			 <th data-options="field:'id',width:160,resizable:true,align:'left',hidden:true">id</th>
+			 <th data-options="field:'n_title',width:160,resizable:true,align:'left'">文章标题</th>
+			 <th data-options="field:'typeName',width:160,resizable:true,align:'left'">文章类型</th>
+			 <th data-options="field:'n_type',width:160,resizable:true,align:'left',hidden:true">文章类型ID</th>
+			 <th data-options="field:'n_content',width:160,resizable:true,align:'left',hidden:true">文章内容</th>
+			 <th data-options="field:'c_time',width:160,resizable:true,align:'left'">发布时间</th>
+			 <th data-options="field:'status',width:160,resizable:true,align:'left',formatter:formatter.status">状态</th>
+			 <th data-options="field:'opt',width:160,resizable:true,align:'left',formatter:formatter.opt">操作</th>
+		 </thead>
+	 </table>
+	 
+	 <div class="hide-panel">
+	        <div id="newsDialog" style="width:800px;height:600px;padding-left:50px;" data-options="resizable:false,modal:true,closed: true">
+	            <form id="newsForm" name="form" class="form_style" method="post" onsubmit="return false;">
+	                <input type="hidden" name="id" id="id" />
+	                <div class="form-field">
+                    	   <label>文章类型:</label><br>
+                    	   <input id="type" name="n_type" class="easyui-combobox" data-options="
+							editable:false,
+							required:true,
+					        valueField:'id',
+				       		textField:'t_name',
+				        	data:${newsClass2}"
+					        style="width: 155px;">
+                    </div>
+	                <div class="form-field">
+	                    <label for="edit_desc">文章标题：<font color="red">*</font></label><br>
+	                    <textarea style="width:700px;height:50px;resize:none;" id="edit_desc" name="n_title" class="easyui-validatebox" data-options="required:true"></textarea>
+	                </div>
+	                <div class="form-field">
+	                    <label for="edit_answer">文章内容：<font color="red">*</font></label>
+	                  <!--   <textarea style="width:500px;height:100px;resize:none;" id="edit_answer" name="answer" class="easyui-validatebox" data-options="required:true"></textarea> -->
+	                   <!-- 
+	                   	<script type="text/plain" id="myEditor" style="width:700px;height:400px" name="answer">
+   							<p>这里我可以写一些输入提示</p>
+						</script>
+						 -->
+						<textarea name="n_content" id="answer" style="width:700px;height:300px;visibility:hidden;"></textarea>
+	                </div>
+	            </form>
+		        </div>
+	    </div>
+	    
+</div>
+</body>
+<!-- 实例化编辑器 -->
+<script type="text/javascript">
+/* KindEditor.ready(function(K) {
+	window.editor = K.create('textarea[name="answer"]', {
+		cssPath : '${base}/assets/common/kindeditor/plugins/code/prettify.css',
+		uploadJson : '${base}/jsp/upload_json.jsp',
+		fileManagerJson : '${base}/jsp/file_manager_json.jsp',
+		allowFileManager : true,
+		afterCreate : function() {
+			var self = this;
+			K.ctrl(document, 13, function() {
+				self.sync();
+				document.forms['form'].submit();
+			});
+			K.ctrl(self.edit.doc, 13, function() {
+				self.sync();
+				document.forms['form'].submit();
+			});
+		},
+		afterBlur: function () { this.sync(); }
+	});
+	prettyPrint();
+}); */
+//var ue = UM.getEditor('myEditor');
+	/* var ue = UE.getEditor('myEditor',{
+		toolbars: [
+		           ['source', 'undo', 'redo','bold', 'italic', 'underline', 'fontborder', 'strikethrough'],
+		           ['superscript', 'subscript','forecolor','backcolor','insertorderedlist','insertunorderedlist'],
+		           ['selectall','cleardoc','paragraph','fontfamily','fontsize','link','unlink'],
+		           ['emotion','image','video','horizontal']
+		       ]
+	}); */
+</script>
+</html>
+</#compress>
