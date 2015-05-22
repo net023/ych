@@ -29,4 +29,14 @@ public class MtSerModel extends Model<MtSerModel> {
 		return this.find(sql);
 	}
 	
+	public List<MtSerModel> getAllFirsts() {
+		String sql = "select `id`, `name` from mtser where p_id is null";
+		return this.find(sql);
+	}
+	
+	public List<MtSerModel> getAllSecondCategoriesByParent(Integer pid) {
+		String sql = "select `id`, `name` from mtser where p_id = ?";
+		return this.find(sql, pid);
+	}
+	
 }

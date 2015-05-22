@@ -1,0 +1,72 @@
+<#compress>
+<!DOCTYPE html>
+<html>
+<head>
+<title>品牌管理</title>
+<meta charset="UTF-8">
+<% include("/pager/common/quote.html"){} %>
+</head>
+<body>
+    <div class="body-center">
+        <div class="html-panel query-panel" id="query_con">
+            <div class="panel-header"><div class="panel-title">过滤项添加</div></div>
+            <div class="panel-content" id="menuMgrPanel">
+                <form onsubmit="return false;" id="addForm" class="form_style">
+                		<span class="spacing">
+                			<label>一级分类：</label>
+	                		<input id="firstCategory" name="firstCategory" class="easyui-combobox" data-options="
+								editable:false,
+								required:true,
+						        valueField:'id',
+						        textField:'name',
+						        data:${firstCategories}"
+						        style="width: 155px;">
+                		</span>
+                		<span class="spacing">
+                			<label>二级分类：</label>
+	                		<input id="secondCategory" name="secondCategory" class="easyui-combobox" data-options="
+								editable:false,
+								required:false,
+						        valueField:'id',
+						        textField:'name',
+						        data:${secondCategories}"
+						        style="width: 155px;">
+                		</span>
+                		<span class="spacing">
+                			<label>过滤零配件品牌：</label>
+                			<input class="easyui-validatebox" type="text" name="brandFilter" data-options="required:true">
+                		</span>
+                    	<span class="spacing">
+                    		<input type="submit" id="addButton" value="添加"/>
+                    	</span>
+                </form>
+            </div>
+        </div>
+        
+        <table id="grid"  data-options="rownumbers:true,pagination:true,url:'mtser_brand/list'" title="品牌过滤列表">
+            <thead>
+            	<th data-options="field:'ms_id',hidden:true">ID</th>
+            	<th data-options="field:'f_ms_id',hidden:true">FID</th>
+            	<th data-options="field:'s_ms_id',hidden:true">SID</th>
+                <th data-options="field:'first_category',resizable:true,align:'left'">一级类目</th>
+            	<th data-options="field:'second_category'">二级类目</th>
+            	<th data-options="field:'brand_filter',width:60">过滤品牌</th>
+                <th data-options="field:'opt',width:80,resizable:true,align:'center',formatter:formatter.opt">操作</th>
+            </thead>
+        </table>
+    </div>
+    
+    <div class="hide-panel">
+        <div id="editDialog" style="width:350px;height:200px;padding-left:30px;" data-options="resizable:false,modal:true,closed: true">
+            <form id="editForm" class="form_style" method="post" onsubmit="return false;">
+                <input type="hidden" name="id" id="id" />
+                <div class="form-field">
+                    <label for="filter">过滤零配件品牌：<font color="red">*</font></label>
+                    <input class="easyui-validatebox" type="text" name="filter" id="filter" data-options="required:true" />
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+</#compress>
