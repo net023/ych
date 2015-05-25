@@ -1,0 +1,50 @@
+<#compress>
+<!DOCTYPE html>
+<html>
+<head>
+<title>保养类目管理</title>
+<% include("/pager/common/quote.html"){} %>
+<script type="text/javascript">
+window.mtsers = ${mtsersJson};
+window.mtsers.push({id:0,isParent:true, parentID:-1,status:1,showName:'ROOT',name:'ROOT'});
+</script>
+<style type="text/css">
+    .mtsers{width: 250px;float: left;}
+    .edit{margin-left: 255px;}
+</style>
+</head>
+<body>
+    <div class="body-center">
+        <div class="html-panel mtsers">
+            <div class="panel-header"><div class="panel-title">保养类目结构</div></div>
+            <div class="panel-content" id="mtserMgrPanel">
+                <div id="mtserPanel" class="ztree"></div>
+            </div>
+        </div>
+        <div class="html-panel edit">
+            <div class="panel-header"><div class="panel-title">保养类目编辑</div></div>
+            <div class="panel-content" id="editMtser">
+                <form class="form_style" id="mtserEditForm" onsubmit="return false;">
+                    <input type="hidden" name="id" id="id" />
+                    <div class="form-field">
+                        <label for="name">名称：<font color="red">*</font></label>
+                        <input class="easyui-validatebox" type="text" name="name" id="name" data-options="required:true" maxlength="30" />
+                    </div>
+                    <div class="form-field">
+                        <label for="parentName">父类目：<font color="red">*</font></label>
+                        <input class="easyui-validatebox" type="text" name="parentName" id="parentName" readonly="readonly" data-options="required:true" />
+                        <input type="hidden" name="p_id" />
+                        <input type="hidden" name="type" />
+                        <input type="hidden" name="isParent"/>
+                    </div>
+                    <div class="form-field" style="padding-left: 80px;">
+                        <span class="spacing"><input type="submit" id="submitForm" value="提交" /></span>
+                        <span class="spacing"><input type="reset" id="resetForm" value="重置"/></span>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+</#compress>
