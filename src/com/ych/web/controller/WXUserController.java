@@ -2,9 +2,12 @@ package com.ych.web.controller;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
 
+import com.jfinal.aop.Before;
 import com.jfinal.log.Logger;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.tx.Tx;
 import com.ych.base.common.BaseController;
 import com.ych.base.common.Pager;
 import com.ych.core.plugin.annotation.Control;
@@ -45,6 +48,17 @@ public class WXUserController extends BaseController {
 		String d = getPara("d");
 		GEOTool.inToDB(d);
 		renderJson("1");
+	}
+	
+	@Before(Tx.class)
+	public void modify(){
+		Integer id = getParaToInt("id");
+		Integer status = getParaToInt("state");
+		boolean b = WXUserModel.dao.modify(id, status);
+		Map<String, Object> result = getResultMap();
+		result.put(RESULT, b);
+		result.put(MESSAGE, b ? "保存成功" : "保存失败，请联系管理员！");
+		renderJson(result);
 	}
 	
 }

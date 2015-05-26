@@ -1,0 +1,60 @@
+<#compress>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>轮播管理</title>
+<% include("/pager/common/quote.html"){} %>
+</head>
+<body>
+<div class="body-center">
+	<div>
+		 <table id="grid" data-options="rownumbers:true,pagination:true,url:'carousel/list'" title="轮播管理">
+			 <thead>
+				 <th data-options="field:'id',width:160,resizable:true,align:'left',hidden:true">id</th>
+				 <th data-options="field:'f_id',width:160,resizable:true,align:'left',formatter:formatter.img">轮播图片</th>
+				 <th data-options="field:'n_id',width:160,resizable:true,align:'left',hidden:true">文章ID</th>
+				 <th data-options="field:'n_title',width:160,resizable:true,align:'left'">连接文章</th>
+				 <th data-options="field:'order',width:80,resizable:true,align:'left'">显示顺序</th>
+				 <th data-options="field:'status',width:160,resizable:true,align:'left',formatter:formatter.state">状态</th>
+				 <th data-options="field:'opt',width:100,resizable:true,align:'left',formatter:formatter.opt">操作</th>
+			 </thead>
+		 </table>
+	</div>
+	 
+	 <div class="hide-panel">
+		<div id="carouselEditDialog" style="width:300px;height:200px;" data-options="resizable:false,modal:true,closed: true">
+            <form id="carouselEditForm" class="form_style" method="post" onsubmit="return false;">
+                <input type="hidden" name="f_id" id="f_id" />
+                <input type="hidden" name="id" id="id" />
+                <table>
+                	<tr>
+                		<td>链接文章:<font color="red">*</font></td>
+                		<td>
+                			<input id="n_id" name="n_id" class="easyui-combobox" data-options="editable:true,required:true,valueField:'id',textField:'n_title',data:${n_titles}" style="width: 155px;">
+                		</td>
+                	</tr>
+                	<tr>
+                		<td>显示顺序<font color="red">*</font></td>
+                		<td>
+                			<input type="text" name="order" class="easyui-validatebox" data-options="required:true,validType:'number'">
+                		</td>
+                	</tr>
+                </table>
+            </form>
+            <span id="img">
+            	<label>上传图片<font color="red"></font></label>
+           		<input type="file" name="upFile" id="carousel">
+            </span>
+        </div>
+        
+        
+        <div id="imgShowDialog" style="width:350px;height:350px;" data-options="resizable:false,modal:true,closed: true">
+             <img alt="图片" style="width:330px;height:300px" id="imgUrl">
+        </div>
+        
+	</div>
+</div>
+</body>
+</html>
+</#compress>

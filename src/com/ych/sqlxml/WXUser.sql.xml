@@ -5,7 +5,7 @@
 	<sql id="pager">
 		<![CDATA[ 
 			from(
-				select `name`,openid,c_time,phone from user where 1=1
+				select id,`status`,`name`,openid,c_time,phone from user where 1=1
 				<% if(!isEmpty(startDate)){ %>
 					AND c_time>=#'$startDate$'#
 				<% } %>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sql-statement namespace="Carousel">
+	 <sql id="pager">
+		 <![CDATA[
+			 FROM(
+				 select t1.*,t2.n_title from (
+					select id,f_id,n_id,`order`,`status` from carousel
+				)t1
+				left join news t2 on t2.id = t1.n_id
+				order by `order`
+			 )t
+		 ]]>
+	 </sql>
+</sql-statement>

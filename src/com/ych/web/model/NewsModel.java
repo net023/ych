@@ -76,5 +76,11 @@ public class NewsModel extends Model<NewsModel> {
 	public boolean modify(Integer id,Integer status){
 		return Db.update("update news set status = ? where id = ?",status,id)==1;
 	}
+	
+	public List<NewsModel> getAll_id_title(){
+		String sql = "select id,n_title from news";
+		return this.find(sql);
+	}
+	
 
 }

@@ -9,7 +9,9 @@
 <body>
     <div class="body-center">
         <div class="html-panel query-panel" id="query_con">
-            <div class="panel-header"><div class="panel-title">查询条件</div><div><a href="index.html">geo.js</a></div></div>
+            <div class="panel-header"><div class="panel-title">查询条件</div>
+            	<!-- <div><a href="index.html">geo.js</a></div> -->
+            </div>
             <div class="panel-content" id="menuMgrPanel">
                 <form onsubmit="return false;" id="queryForm" class="form_style">
                 		<span class="spacing">
@@ -29,8 +31,10 @@
         
         <table id="grid"  data-options="rownumbers:true,pagination:true,url:'wx_user/list'" title="微信用户列表">
             <thead>
+            	<th data-options="field:'id',width:80,resizable:true,align:'left',hidden:true">id</th>
                 <th data-options="field:'openid',width:80,resizable:true,align:'left'">openID</th>
                 <th data-options="field:'name',width:80,resizable:true,align:'left'">微信昵称</th>
+                <th data-options="field:'status',width:80,resizable:true,align:'left',formatter:formatter.status">状态</th>
                 <th data-options="field:'c_time',width:80,resizable:true,align:'left'">创建时间</th>
                 <th data-options="field:'phone',width:225,resizable:true,align:'left'">手机号码</th>
             </thead>

@@ -251,8 +251,35 @@ var formatter = {
         var html = '<a class="spacing a-blue" onclick="updVersion('+rowIndex+');" href="javascript:void(0);">修改</a>';
             html+= '<a class="spacing a-red" onclick="delVersion('+rowIndex+');" href="javascript:void(0);">删除</a>';
         return html;
-    }
+    },
+    status:function(value,rowData,rowIndex){
+		var states = {
+				0:'已启用',
+				1:'已禁用'
+		}[rowData.status];
+		var toStates = {
+				0:1,
+				1:0
+		}[rowData.status];
+		var color = {
+				0:'green',
+				1:'red'
+		}[rowData.status];
+		
+		return states && ('<a class="spacing a-'+color+'" onclick="modify('+rowData.id+','+toStates+');" href="javascript:void(0);">'+states+'</a>');
+	}
 };
+
+
+function modify(i,s){
+	$._ajaxPost("store/modify",{id:i,state:s},function(r){
+		if(r.r){
+			$("#grid").datagrid('load');
+		}else{
+			$.messager.alert('操作失败',r.m,'error');
+		}
+	});
+}
 
 
 /*修改版本*/

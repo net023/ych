@@ -35,5 +35,8 @@ public class StoreModel extends Model<StoreModel> {
 		 return Db.update("delete from store where id in"+ids);
 	 }
 	
+	public boolean modify(Integer id,Integer status){
+		return Db.update("update store set status = ? where id = ?",status,id)==1;
+	}
 	
 }

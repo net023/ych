@@ -22,7 +22,7 @@ public class FileController extends BaseController {
 	public void upload() {
 		Map<String, Object> result = getResultMap();
 		try {
-			UploadFile upload = getFile("storePic", SysConstants.IMG_DIR, SysConstants.MAX_POST_SIZE);
+			UploadFile upload = getFile("upFile", SysConstants.IMG_DIR, SysConstants.MAX_POST_SIZE);
 			String fileName = upload.getOriginalFileName();
 			String newFileName = DateTools.format(new Date(), DateTools.yyyyMMddHHmmssSSS) + fileName.substring(fileName.lastIndexOf("."), fileName.length());
 			//修改上传文件的文件名称

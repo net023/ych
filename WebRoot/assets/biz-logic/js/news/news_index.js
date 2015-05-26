@@ -80,8 +80,8 @@ $(function() {
 	 },
 	 status:function(value,rowData,rowIndex){
 		var states = {
-				0:'新增',
-				1:'过期'
+				0:'已启用',
+				1:'已禁用'
 		}[rowData.status];
 		var toStates = {
 				0:1,

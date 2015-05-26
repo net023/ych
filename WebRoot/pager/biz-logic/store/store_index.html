@@ -36,6 +36,7 @@
             	<th data-options="field:'fs',hidden:true">fs</th>
             	<th data-options="field:'ms',hidden:true">ms</th>
                 <th data-options="field:'c_time',width:80,resizable:true,align:'left'">创建时间</th>
+                <th data-options="field:'status',width:160,resizable:true,align:'left',formatter:formatter.status">状态</th>
                 <th data-options="field:'opt',width:80,resizable:true,align:'center',formatter:formatter.opt">操作</th>
             </thead>
         </table>
@@ -97,7 +98,7 @@
                 </div>
                 <div class="form-field">
                 	<label>门店照片：<font color="red">*</font></label>
-                	<input type="file" name="storePic" id="storePic">
+                	<input type="file" name="upFile" id="storePic">
                 	<table>
                 		<thead style="color: red;"><font color="red">注：JPG格式，380*230尺寸</font></thead>
                 		<tr id="picNode">

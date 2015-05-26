@@ -141,12 +141,14 @@ public class StoreController extends BaseController {
 				List<StorePicModel> storePics = StorePicModel.dao.getBySid(s_id);
 				for (StorePicModel storePicModel : storePics) {
 					FileModel fileModel = FileModel.dao.findById(storePicModel.getInt("f_id"));
-					String path = fileModel.getStr("l_path");
-					if(StrKit.notBlank(path)){
-						FileKit.delete(new File(path));
+					if(null!=fileModel){
+						String path = fileModel.getStr("l_path");
+						if(StrKit.notBlank(path)){
+							FileKit.delete(new File(path));
+						}
+						fileModel.delete();
+						storePicModel.delete();
 					}
-					fileModel.delete();
-					storePicModel.delete();
 				}
 			}
 			// 删除服务类型关系
@@ -163,6 +165,17 @@ public class StoreController extends BaseController {
 			result.put(RESULT, false);
 			result.put(MESSAGE, "Store批量删除失败！");
 		}
+		renderJson(result);
+	}
+	
+	@Before(Tx.class)
+	public void modify(){
+		Integer id = getParaToInt("id");
+		Integer status = getParaToInt("state");
+		boolean b = StoreModel.dao.modify(id, status);
+		Map<String, Object> result = getResultMap();
+		result.put(RESULT, b);
+		result.put(MESSAGE, b ? "保存成功" : "保存失败，请联系管理员！");
 		renderJson(result);
 	}
 

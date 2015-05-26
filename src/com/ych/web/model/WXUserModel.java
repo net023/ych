@@ -2,6 +2,7 @@ package com.ych.web.model;
 
 import java.util.LinkedList;
 
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Model;
 import com.jfinal.plugin.activerecord.Page;
 import com.ych.base.common.Pager;
@@ -20,5 +21,9 @@ public class WXUserModel extends Model<WXUserModel> {
 				" select * ",
 				SqlXmlKit.getSql("WXUser.pager", pager.getParamsMap(), param),
 				param.toArray());
+	}
+	
+	public boolean modify(Integer id,Integer status){
+		return Db.update("update user set status = ? where id = ?",status,id)==1;
 	}
 }
