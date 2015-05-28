@@ -9,7 +9,7 @@ import com.ych.base.common.Pager;
 import com.ych.core.kit.SqlXmlKit;
 import com.ych.core.plugin.annotation.Table;
 
-@Table(tableName = "user")
+@Table(tableName = "wxuser")
 public class WXUserModel extends Model<WXUserModel> {
 	
 	private static final long serialVersionUID = 1L;
@@ -24,6 +24,6 @@ public class WXUserModel extends Model<WXUserModel> {
 	}
 	
 	public boolean modify(Integer id,Integer status){
-		return Db.update("update user set status = ? where id = ?",status,id)==1;
+		return Db.update("update wxuser set status = ? where id = ?",status,id)==1;
 	}
 }
