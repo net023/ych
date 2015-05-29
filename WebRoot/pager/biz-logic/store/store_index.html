@@ -26,6 +26,7 @@
             <thead>
             	<th data-options="field:'id',hidden:true">ID</th>
                 <th data-options="field:'name',width:80,resizable:true,align:'left'">门店名称</th>
+                <th data-options="field:'username',width:80,resizable:true,align:'left'">门店登录用户名</th>
             	<th data-options="field:'address',hidden:true">address</th>
             	<th data-options="field:'info',hidden:true">info</th>
             	<th data-options="field:'lon',hidden:true">lon</th>
@@ -36,6 +37,7 @@
             	<th data-options="field:'fs',hidden:true">fs</th>
             	<th data-options="field:'ms',hidden:true">ms</th>
                 <th data-options="field:'c_time',width:80,resizable:true,align:'left'">创建时间</th>
+                <th data-options="field:'back',width:160,resizable:true,align:'left',formatter:formatter.back">修改后台登录账户</th>
                 <th data-options="field:'status',width:160,resizable:true,align:'left',formatter:formatter.status">状态</th>
                 <th data-options="field:'opt',width:80,resizable:true,align:'center',formatter:formatter.opt">操作</th>
             </thead>
@@ -48,6 +50,22 @@
     </div>
     
     <div class="hide-panel">
+    	<div id="backUserDialog" style="width:350px;height:180px;padding-left:30px;" data-options="resizable:false,modal:true,closed: true">
+    		<form id="backUserForm" class="form-style" method="post" onsubmit="return false;">
+    			<input type="hidden" name="id">
+	    		<div class="form-field">
+	    			<label for="username">用户名:<font color="red">*</font></label>
+	    			<input class="easyui-validatebox" type="text" name="username" id="username" data-options="required:true">
+	    		</div>
+	    		<div class="form-field">
+	    			<label for="password">密码:<font color="red">*</font></label>
+	    			<input class="easyui-validatebox" type="password" name="password" id="password" data-options="required:true">
+	    		</div>
+    		</form>
+    	</div>
+    </div>
+    
+    <div class="hide-panel">
         <div id="editDialog" style="width:800px;height:600px;padding-left:30px;" data-options="resizable:false,modal:true,closed: true">
             <form id="editForm" class="form_style" method="post" onsubmit="return false;">
                 <input type="hidden" name="id" id="id" />
@@ -55,6 +73,10 @@
                 <div class="form-field">
                     <label for="edit_version">门店名称：<font color="red">*</font></label>
                     <input class="easyui-validatebox" type="text" name="name" data-options="required:true" />
+                </div>
+                <div class="form-field">
+                    <label for="edit_version">门店登录用户名：<font color="red">*</font></label>
+                    <input class="easyui-validatebox" type="text" name="username" data-options="required:true" />
                 </div>
                 <div class="form-field">
                     <label for="lon">经度：<font color="red">*</font></label>

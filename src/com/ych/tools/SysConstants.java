@@ -24,6 +24,11 @@ public class SysConstants {
 	 * 默认用户密码
 	 */
 	public static final String DEFAULT_PASSWORD = "111111";
+	
+	/**
+	 * 门店后台登录默认密码
+	 */
+	public static final String BACK_DEFAULT_PASSWORD = "222222";
 
 	/**
 	 * DEBUG模式

@@ -182,6 +182,21 @@ $(function() {
         }},{text:'关闭',handler:function(){$('#editDialog').dialog('close');}}]
     });
 	
+	$('#backUserDialog').dialog({
+		buttons:[{text:'保存',handler:function(){
+			if(!$('#backUserForm').form('validate')){return;}
+			$('#backUserForm')._ajaxForm(function(r){
+				if(r.r){
+					$('#backUserDialog').dialog('close');
+					$("#grid").datagrid('load');
+					$.messager.alert('操作提示', r.m,'info');
+				}else{$.messager.alert('操作提示', r.m,'error');}
+			});
+			
+		}},{text:'关闭',handler:function(){$('#backUserDialog').dialog('close');}}]
+	});
+	
+	
 	var grid = $('#grid')._datagrid({
 		checkOnSelect:false,
         selectOnCheck:false,
@@ -267,9 +282,19 @@ var formatter = {
 		}[rowData.status];
 		
 		return states && ('<a class="spacing a-'+color+'" onclick="modify('+rowData.id+','+toStates+');" href="javascript:void(0);">'+states+'</a>');
+	},
+	back:function(value,rowData,rowIndex){
+		return '<a class="spacing a-blue" onclick="upBackUser('+rowIndex+');" href="javascript:void(0);">修改</a>';
 	}
 };
 
+
+function upBackUser(rowIndex){
+	$('#backUserForm').attr('action','store/updateBackUser').resetForm();
+    var data = $('#grid').datagrid('getRows')[rowIndex];
+    $('#backUserForm')._jsonToForm(data);
+	$('#backUserDialog').dialog('open').dialog('setTitle','修改后台登录账户');
+}
 
 function modify(i,s){
 	$._ajaxPost("store/modify",{id:i,state:s},function(r){

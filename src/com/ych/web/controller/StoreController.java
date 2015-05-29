@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.jfinal.aop.Before;
+import com.jfinal.kit.EncryptionKit;
 import com.jfinal.kit.FileKit;
 import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.StrKit;
@@ -16,6 +17,7 @@ import com.jfinal.plugin.activerecord.tx.Tx;
 import com.ych.base.common.BaseController;
 import com.ych.base.common.Pager;
 import com.ych.core.plugin.annotation.Control;
+import com.ych.tools.SysConstants;
 import com.ych.web.model.FileModel;
 import com.ych.web.model.MtSerModel;
 import com.ych.web.model.ProvinceModel;
@@ -65,6 +67,7 @@ public class StoreController extends BaseController {
 		try {
 			getFile();
 			StoreModel store = getModelWithOutModelName(StoreModel.class, true);
+			store.set("password", EncryptionKit.md5Encrypt(SysConstants.BACK_DEFAULT_PASSWORD));
 			store.set("c_time", new Date()).save();
 			// 图片文件id
 			String fsStr = getPara("fs");
@@ -129,6 +132,30 @@ public class StoreController extends BaseController {
 		}
 		renderJson(result);
 	}
+	
+	@Before(Tx.class)
+	public void updateBackUser(){
+		Map<String, Object> result = getResultMap();
+		try {
+			String username = getPara("username");
+			String password = getPara("password");
+			Integer uid = getParaToInt("id");
+			boolean isUpdate = StoreModel.dao.findById(uid).set("username", username).set("password", EncryptionKit.md5Encrypt(password)).update();
+			if(isUpdate){
+				result.put(RESULT, true);
+				result.put(MESSAGE, "门店后台账户更新成功！");
+			}else{
+				result.put(RESULT, false);
+				result.put(MESSAGE, "门店后台账户更新失败！");
+			}
+		} catch (Exception e) {
+			LOG.debug("门店后台账户更新失败！" + e.getMessage());
+			result.put(RESULT, false);
+			result.put(MESSAGE, "门店后台账户更新失败！");
+		}
+		renderJson(result);
+	}
+	
 
 	@Before(Tx.class)
 	public void batchDel() {
