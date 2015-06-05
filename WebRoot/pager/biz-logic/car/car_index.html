@@ -1,0 +1,50 @@
+<#compress>
+<!DOCTYPE html>
+<html>
+<head>
+<title>车型数据库管理</title>
+<meta charset="UTF-8">
+<% include("/pager/common/quote.html"){} %>
+</head>
+<body>
+    <div class="body-center">
+        <div class="html-panel query-panel" id="query_con">
+            <div class="panel-header"><div class="panel-title">查询条件</div></div>
+            <div class="panel-content" id="menuMgrPanel">
+            	 <form onsubmit="return false;" id="queryForm" class="form_style">
+                		<span class="spacing">
+                			<label>销售名称：</label>
+                			<input type="text" name="name">
+                		</span>
+                		<span class="spacing">
+                			<label>力洋ID：</label>
+                			<input type="text" name="ly_id">
+                		</span>
+		                <span class="spacing">
+		                	<input type="submit" id="queryButton" value="查询"/>
+		                </span>
+                </form>
+                <span>
+              		<label>导入车型库excel：</label>
+                	<input type="file" name="batchup" id="batchup" value="批量导入">
+                </span>
+            </div>
+        </div>
+        
+        <table id="grid"  data-options="rownumbers:true,pagination:true,url:'car/list'" title="车型数据库列表">
+            <thead>
+            	<th data-options="field:'id',hidden:true">ID</th>
+                <th data-options="field:'name',width:80,resizable:true,align:'left'">销售名称</th>
+                <th data-options="field:'manf',width:80,resizable:true,align:'left'">厂商</th>
+                <th data-options="field:'brand',width:80,resizable:true,align:'left'">品牌</th>
+                <th data-options="field:'series',width:80,resizable:true,align:'left'">系列</th>
+                <th data-options="field:'type',width:80,resizable:true,align:'left'">车型</th>
+                <th data-options="field:'ly_id',width:80,resizable:true,align:'left'">力洋ID</th>
+                <th data-options="field:'status',width:160,resizable:true,align:'left',formatter:formatter.status">状态</th>
+            </thead>
+        </table>
+    </div>
+    
+</body>
+</html>
+</#compress>

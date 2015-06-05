@@ -1,8 +1,14 @@
 package com.ych.base.common;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.Model;
+import com.jfinal.plugin.activerecord.Page;
+import com.ych.core.kit.SqlXmlKit;
 
 public class Pager {
 
@@ -98,6 +104,7 @@ public class Pager {
 	}
 
 	public Map<String, Object> getParamsMap() {
+		addParam("page", pageNo);
 		getMap().put("begRow", begRow);
 		getMap().put("pageSize", pageSize);
 		return params;
@@ -129,6 +136,24 @@ public class Pager {
 	public void clearParam() {
 		getMap().clear();
 	}
+	
+	
+	public static <T>Page<T> pageHandler(String dataSqlID,String countSqlID,Map<String, Object> dataParam,Map<String, Object> countParam,T model){
+		LinkedList<Object> paramData = new LinkedList<Object>();
+		LinkedList<Object> paramCount = new LinkedList<Object>();
+		String dataSql = SqlXmlKit.getSql(dataSqlID, dataParam, paramData);
+		String countSql = SqlXmlKit.getSql(countSqlID, countParam, paramCount);
+		List<T> data = ((Model)model).find(dataSql, paramData.toArray());
+		Long totalRow = Db.queryLong(countSql, paramCount.toArray());
+		int pageSize = (int)dataParam.get("pageSize");
+		int pageNo = (int)dataParam.get("page");
+		int totalPage = (int)(totalRow / pageSize);
+		if (totalRow % pageSize != 0L) {
+			totalPage++;
+		}
+		return new Page<T>(data, pageNo, pageSize, totalPage, Integer.valueOf(totalRow.toString()));
+	}
+	
 
 	@Override
 	public String toString() {

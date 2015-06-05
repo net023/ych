@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sqlGroup namespace="Car">
+	
+	<!-- 动态SQL处理 -->
+	<sql id="pager">
+		<![CDATA[ 
+				select t1.*,t2.name as 'type',t3.name as 'series',t4.name as 'brand',t5.name as 'manf' from (
+					select id,name,ly_id,`status`,t_id from car where 1=1
+					<% if(!isEmpty(name)){ %>
+					 AND name like #'%$name$%'#
+					<% } %>
+					<% if(!isEmpty(ly_id)){ %>
+					 AND ly_id = #'$ly_id$'#
+					<% } %>
+					limit #$begRow$#,#$pageSize$#
+				)t1
+				left join car_type t2 on t1.t_id=t2.id
+				left join car_series t3 on t2.s_id=t3.id
+				left join car_brand t4 on t3.b_id=t4.id
+				left join car_manf t5 on t4.m_id=t5.id
+		]]>
+	</sql>
+	<sql id="count">
+		<![CDATA[ 
+			select count(*) from car where 1=1 
+			<% if(!isEmpty(name)){ %>
+			 AND name like #'%$name$%'#
+			<% } %>
+			<% if(!isEmpty(ly_id)){ %>
+			 AND ly_id = #'$ly_id$'#
+			<% } %>
+		]]>
+	</sql>
+	
+	
+	<sql id="pager1">
+		<![CDATA[ 
+			from(
+				select t1.*,t2.name as 'type',t3.name as 'series',t4.name as 'brand',t5.name as 'manf' from (
+					select id,name,ly_id,`status`,t_id from car where 1=1
+					<% if(!isEmpty(name)){ %>
+					 AND name like #'%$name$%'#
+					<% } %>
+					<% if(!isEmpty(ly_id)){ %>
+					 AND ly_id = #'$ly_id$'#
+					<% } %>
+				)t1
+				left join car_type t2 on t1.t_id=t2.id
+				left join car_series t3 on t2.s_id=t3.id
+				left join car_brand t4 on t3.b_id=t4.id
+				left join car_manf t5 on t4.m_id=t5.id
+			)t 
+		]]>
+	</sql>
+	
+	
+</sqlGroup>

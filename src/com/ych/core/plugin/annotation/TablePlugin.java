@@ -25,6 +25,7 @@ public class TablePlugin implements IPlugin {
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	@Override
 	public boolean start() {
+//		List<Class<? extends Model>> modelClasses = ClassSearcherKit.of(BaseModel.class).search();// 查询所有继承BaseModel的类
 		List<Class<? extends Model>> modelClasses = ClassSearcherKit.of(Model.class).search();// 查询所有继承BaseModel的类
 		// 循环处理自动注册映射
 		for (Class model : modelClasses) {

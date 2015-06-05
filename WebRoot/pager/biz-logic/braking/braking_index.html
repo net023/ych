@@ -1,0 +1,83 @@
+<#compress>
+<!DOCTYPE html>
+<html>
+<head>
+<title>制动系数据库管理</title>
+<meta charset="UTF-8">
+<% include("/pager/common/quote.html"){} %>
+</head>
+<body>
+    <div class="body-center">
+        <div class="html-panel query-panel" id="query_con">
+            <div class="panel-header"><div class="panel-title">查询条件</div></div>
+            <div class="panel-content" id="menuMgrPanel">
+            	 <form onsubmit="return false;" id="queryForm" class="form_style">
+                		<span class="spacing">
+                			<label>类型：</label>
+	                		<input id="type" name="type" class="easyui-combobox" data-options="
+								editable:false,
+								required:true,
+						        valueField:'id',
+						        textField:'name',
+						        data:${types}"
+						        style="width: 155px;">
+                		</span>
+                		<span class="spacing">
+                			<label>品牌：</label>
+	                		<input id="brand" name="brand" class="easyui-combobox" data-options="
+								editable:false,
+								required:false,
+						        valueField:'id',
+						        textField:'name',
+						        data:${brands}"
+						        style="width: 155px;">
+                		</span>
+                		<span class="spacing">
+                			<label>编号：</label>
+                			<input type="text" name="snumber" >
+                		</span>
+                		<span class="spacing">
+                			<label>力洋ID：</label>
+                			<input type="text" name="lyid" >
+                		</span>
+		                <span class="spacing">
+		                	<input type="submit" id="queryButton" value="查询"/>
+		                </span>
+                </form>
+                <span>
+              		<label>导入制动系库excel：</label>
+                	<input type="file" name="batchup" id="batchup" value="批量导入">
+                </span>
+            </div>
+        </div>
+        
+        <table id="grid"  data-options="rownumbers:true,pagination:true,url:'braking/list'" title="制动系数据库列表">
+            <thead>
+            	<th data-options="field:'id',hidden:true">ID</th>
+                <th data-options="field:'type',width:80,resizable:true,align:'left'">类型</th>
+                <th data-options="field:'brand',width:80,resizable:true,align:'left'">品牌</th>
+                <th data-options="field:'snumber',width:80,resizable:true,align:'left'">编号</th>
+                <th data-options="field:'ly_id',width:80,resizable:true,align:'left'">力洋ID</th>
+                <th data-options="field:'price',width:80,resizable:true,align:'left'">价格</th>
+                <th data-options="field:'status',width:160,resizable:true,align:'left',formatter:formatter.status">状态</th>
+                <th data-options="field:'recmd',width:160,resizable:true,align:'left',formatter:formatter.recmd">推荐</th>
+                <th data-options="field:'editPrice',width:160,resizable:true,align:'left',formatter:formatter.editPrice">修改价格</th>
+            </thead>
+        </table>
+    </div>
+    
+    <div class="hide-panel">
+    	<div id="priceDialog" style="width:350px;height:180px;padding-left:30px;" data-options="resizable:false,modal:true,closed: true">
+    		<form id="priceForm" class="form-style" method="post" onsubmit="return false;">
+    			<input type="hidden" name="id">
+	    		<div class="form-field">
+	    			<label for="price">价格:<font color="red">*</font></label>
+	    			<input class="easyui-validatebox" type="text" name="price" id="price" data-options="required:true">
+	    		</div>
+    		</form>
+    	</div>
+    </div>
+    
+</body>
+</html>
+</#compress>

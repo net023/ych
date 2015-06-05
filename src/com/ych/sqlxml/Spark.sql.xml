@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sqlGroup namespace="Spark">
+	
+	<!-- 动态SQL处理 -->
+	<sql id="pager">
+		<![CDATA[ 
+				select t1.id,t1.s_number snumber,t1.ly_id,t1.price,t1.`status`,t1.recmd,t3.`name` brand,t2.`name` series,t4.`name` model from (
+					select id,s_id,b_id,s_number,m_id,ly_id,price,`status`,recmd from spark_product where 1=1 
+					<% if(!isEmpty(snumber)){ %>
+					 AND s_number = #'$snumber$'#
+					<% } %>
+					<% if(!isEmpty(lyid)){ %>
+					 AND ly_id = #'$lyid$'#
+					<% } %>
+					<% if(!isEmpty(series)){ %>
+					 AND s_id = #$series$#
+					<% } %>
+					<% if(!isEmpty(model)){ %>
+					 AND m_id = #$model$#
+					<% } %>
+					<% if(!isEmpty(brand)){ %>
+					 AND b_id = #$brand$#
+					<% } %>
+					limit #$begRow$#,#$pageSize$#
+				)t1
+				LEFT JOIN spark_series t2 ON t1.s_id=t2.id
+				<% if(!isEmpty(series)){ %>
+				 AND t2.id = #$series$#
+				<% } %>
+				JOIN spark_brand t3 ON t2.b_id = t3.id and t1.b_id = t3.id
+				<% if(!isEmpty(brand)){ %>
+				 AND t3.id = #$brand$#
+				<% } %>
+				LEFT JOIN spark_model t4 ON t1.m_id = t4.id
+				<% if(!isEmpty(model)){ %>
+				 AND t4.id = #$model$#
+				<% } %>
+		]]>
+	</sql>
+	<sql id="count">
+		<![CDATA[ 
+			select count(*) from spark_product where 1=1 
+			<% if(!isEmpty(snumber)){ %>
+			 AND s_number = #'$snumber$'#
+			<% } %>
+			<% if(!isEmpty(lyid)){ %>
+			 AND ly_id = #'$lyid$'#
+			<% } %>
+			<% if(!isEmpty(series)){ %>
+			 AND s_id = #$series$#
+			<% } %>
+			<% if(!isEmpty(model)){ %>
+			 AND m_id = #$model$#
+			<% } %>
+			<% if(!isEmpty(brand)){ %>
+			 AND b_id = #$brand$#
+			<% } %>
+		]]>
+	</sql>
+	
+	
+	<!-- 动态SQL处理 -->
+	<sql id="pager1">
+		<![CDATA[
+			from(
+				select t1.id,t1.s_number snumber,t1.ly_id,t1.price,t1.`status`,t1.recmd,t3.`name` brand,t2.`name` series,t4.`name` model from (
+					select id,s_id,b_id,s_number,m_id,ly_id,price,`status`,recmd from spark_product where 1=1 
+					<% if(!isEmpty(snumber)){ %>
+					 AND s_number = #'$snumber$'#
+					<% } %>
+					<% if(!isEmpty(lyid)){ %>
+					 AND ly_id = #'$lyid$'#
+					<% } %>
+					<% if(!isEmpty(series)){ %>
+					 AND s_id = #$series$#
+					<% } %>
+					<% if(!isEmpty(model)){ %>
+					 AND m_id = #$model$#
+					<% } %>
+					<% if(!isEmpty(brand)){ %>
+					 AND b_id = #$brand$#
+					<% } %>
+				)t1
+				LEFT JOIN spark_series t2 ON t1.s_id=t2.id
+				<% if(!isEmpty(series)){ %>
+				 AND t2.id = #$series$#
+				<% } %>
+				JOIN spark_brand t3 ON t2.b_id = t3.id and t1.b_id = t3.id
+				<% if(!isEmpty(brand)){ %>
+				 AND t3.id = #$brand$#
+				<% } %>
+				LEFT JOIN spark_model t4 ON t1.m_id = t4.id
+				<% if(!isEmpty(model)){ %>
+				 AND t4.id = #$model$#
+				<% } %>
+			)t 
+		]]>
+	</sql>
+	
+</sqlGroup>

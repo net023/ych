@@ -161,6 +161,52 @@ public class SqlXmlKit {
 
 		return sql.replaceAll("[\\s]{2,}", " ");
 	}
+	
+	public static String sqlHandler(String sqlTemplete,Map<String, Object> param,LinkedList<Object> list){
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		Set<String> paramKeySet = param.keySet();
+		for (String paramKey : paramKeySet) {
+			paramMap.put(paramKey, param.get(paramKey));
+		}
+		String sql = BeetlKit.render(sqlTemplete, paramMap);
+
+		Pattern pattern = Pattern.compile("#[\\w\\d\\$\\'\\%\\_]+#"); //#[\\w\\d]+#    \\$
+		Pattern pattern2 = Pattern.compile("\\$[\\w\\d\\_]+\\$");
+
+		Matcher matcher = pattern.matcher(sql);
+
+		while (matcher.find()) {
+			String clounm = matcher.group(0); // 得到的结果形式：#'%$names$%'#
+
+			Matcher matcher2 = pattern2.matcher(clounm);
+			matcher2.find();
+			String clounm2 = matcher2.group(0); // 得到的结果形式：$names$
+
+			String clounm3 = clounm2.replace("$", "");
+
+			if (clounm.equals("#" + clounm2 + "#")) { // 数值型，可以对应处理int、long、bigdecimal、double等等
+				String val = String.valueOf(param.get(clounm3));
+				try {
+					Integer.parseInt(val);
+					sql = sql.replace(clounm, val);
+				} catch (NumberFormatException e) {
+					log.error("查询参数值错误，整型值传入了字符串，非法字符串是：" + val);
+					return null;
+				}
+
+			} else { // 字符串，主要是字符串模糊查询、日期比较的查询
+				String val = String.valueOf(param.get(clounm3));
+
+				String clounm4 = clounm.replace("#", "").replace("'", "").replace(clounm2, val);
+				list.add(clounm4);
+
+				sql = sql.replace(clounm, "?");
+			}
+		}
+
+		return sql.replaceAll("[\\s]{2,}", " ");
+	}
+	
 
 	/**
 	 * 清楚加载的sql

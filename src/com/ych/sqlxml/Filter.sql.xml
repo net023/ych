@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sqlGroup namespace="Filter">
+	
+	<!-- 动态SQL处理 -->
+	<sql id="pager">
+		<![CDATA[ 
+				select t1.id,t1.`name` snumber,t1.ly_id,t1.recmd,t1.`status`,t2.`name` brand,t3.`name` type from (
+					select id,t_id,b_id,`name`,ly_id,price,recmd,`status` from filter_product where 1=1 
+					<% if(!isEmpty(snumber)){ %>
+					 AND `name` = #'$snumber$'#
+					<% } %>
+					<% if(!isEmpty(lyid)){ %>
+					 AND ly_id = #'$lyid$'#
+					<% } %>
+					<% if(!isEmpty(type)){ %>
+					 AND t_id = #$type$#
+					<% } %>
+					<% if(!isEmpty(brand)){ %>
+					 AND b_id = #$brand$#
+					<% } %>
+					limit #$begRow$#,#$pageSize$#
+				)t1
+				LEFT JOIN filter_brand t2 ON t1.b_id = t2.id
+				<% if(!isEmpty(brand)){ %>
+				 AND t2.id = #$brand$#
+				<% } %>
+				LEFT JOIN filter_type t3 on t1.t_id = t3.id
+				<% if(!isEmpty(type)){ %>
+				 AND t3.id = #$type$#
+				<% } %>
+		]]>
+	</sql>
+	<sql id="count">
+		<![CDATA[ 
+			select count(*) from filter_product where 1=1 
+			<% if(!isEmpty(snumber)){ %>
+			 AND `name` = #'$snumber$'#
+			<% } %>
+			<% if(!isEmpty(lyid)){ %>
+			 AND ly_id = #'$lyid$'#
+			<% } %>
+			<% if(!isEmpty(type)){ %>
+			 AND t_id = #$type$#
+			<% } %>
+			<% if(!isEmpty(brand)){ %>
+			 AND b_id = #$brand$#
+			<% } %>
+		]]>
+	</sql>
+	
+	<!-- 动态SQL处理 -->
+	<sql id="pager1">
+		<![CDATA[
+			from(
+				select t1.id,t1.`name` snumber,t1.ly_id,t1.recmd,t1.`status`,t2.`name` brand,t3.`name` type from (
+					select id,t_id,b_id,`name`,ly_id,price,recmd,`status` from filter_product where 1=1 
+					<% if(!isEmpty(snumber)){ %>
+					 AND `name` = #'$snumber$'#
+					<% } %>
+					<% if(!isEmpty(lyid)){ %>
+					 AND ly_id = #'$lyid$'#
+					<% } %>
+					<% if(!isEmpty(type)){ %>
+					 AND t_id = #$type$#
+					<% } %>
+					<% if(!isEmpty(brand)){ %>
+					 AND b_id = #$brand$#
+					<% } %>
+				)t1
+				LEFT JOIN filter_brand t2 ON t1.b_id = t2.id
+				<% if(!isEmpty(brand)){ %>
+				 AND t2.id = #$brand$#
+				<% } %>
+				LEFT JOIN filter_type t3 on t1.t_id = t3.id
+				<% if(!isEmpty(type)){ %>
+				 AND t3.id = #$type$#
+				<% } %>
+			)t 
+		]]>
+	</sql>
+	
+</sqlGroup>
