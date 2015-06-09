@@ -1,6 +1,8 @@
 package com.ych.web.controller;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Date;
 import java.util.Map;
 
@@ -47,6 +49,19 @@ public class FileController extends BaseController {
 		Integer fid = getParaToInt("fID");
 		FileModel sf = FileModel.dao.findById(fid);
 		renderFile(new File(sf.getStr("l_path")));
+	}
+	
+	public void df() throws Exception{
+		String fileName = getPara("fn");
+		fileName = URLDecoder.decode(fileName, "UTF-8");
+		String templatePath = getRequest().getServletContext().getRealPath("/template");
+		renderFile(new File(templatePath+"/"+fileName));
+	}
+	
+	public void df2() throws Exception{
+		String fileName = getPara("fn");
+		fileName = URLDecoder.decode(fileName, "UTF-8");
+		renderFile(new File(SysConstants.IMG_DIR+"/"+fileName));
 	}
 	
 	public void delete(){

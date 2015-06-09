@@ -20,6 +20,43 @@ $(function() {
 		}
 	});
 	
+	$("#xzslb").click(function(){
+		//$._ajaxPost("file/df",{fn:"四滤价格表--模版.xlsx"});
+		var fileName = encodeURIComponent(encodeURIComponent("四滤价格表--模版.xlsx"));
+		window.open("file/df?fn="+fileName);
+	});
+	
+	var ii;
+	$("#scslb").fileupload({
+		url:'filter4/batchEdit',
+		dataType: 'json',
+		done:function(e,result){
+			layer.close(ii);
+			if(result.result.r){
+				var fileName = encodeURIComponent(encodeURIComponent(result.result.f));
+				asyncbox.open({
+					title:result.result.m,
+					//html:"<a href='file/df?fn="+result.result.f+"' target='_blank'>点击下载上传结果信息</a>",
+					html:'<a href="#" onclick="javascript:(window.open(\'file/df2?fn='+fileName+'\'))">点击下载上传结果信息</a>',
+					width : 200,
+					height : 200
+				});
+//				$.messager.alert("上传完成",result.result.m);
+			}else{
+				$.messager.alert("上传失败",result.result.m);
+			}
+		},
+		fail:function(){
+			layer.close(ii);
+			$.messager.alert("错误提示","系统异常请联系管理员。");
+		},
+		add: function (e, data) {
+		   ii = layer.load();
+		   data.submit();
+        }
+	});
+	
+	
 	var grid = $('#grid')._datagrid({
 		checkOnSelect:false,
         selectOnCheck:false

@@ -1,13 +1,12 @@
 package com.ych.web.model;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.LinkedList;
 
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Model;
 import com.jfinal.plugin.activerecord.Page;
 import com.ych.base.common.Pager;
-import com.ych.core.kit.SqlXmlKit;
 import com.ych.core.plugin.annotation.Table;
 
 @Table(tableName = "filter_product")
@@ -41,6 +40,10 @@ public class FilterModel extends Model<FilterModel> {
 
 	public boolean recmd(Integer id, Integer status) {
 		return Db.update("update filter_product set recmd = ? where id = ?", status, id) == 1;
+	}
+	
+	public boolean updatePriceByName(BigDecimal price,String name){
+		return Db.update("update filter_product set price=? where name=?", price,name) >0;
 	}
 
 }

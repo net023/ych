@@ -1,8 +1,14 @@
 package com.ych.web.controller;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.net.URLDecoder;
 import java.util.List;
 import java.util.Map;
 
@@ -21,8 +27,6 @@ import com.ych.tools.excel.XxlsPrint;
 import com.ych.web.model.FilterBrandModel;
 import com.ych.web.model.FilterModel;
 import com.ych.web.model.FilterTypeModel;
-import com.ych.web.model.SparkModel;
-import com.ych.web.model.SparkModelModel;
 
 @Control(controllerKey = "/filter4")
 public class FilterController extends BaseController {
@@ -54,6 +58,7 @@ public class FilterController extends BaseController {
 		renderJson();
 	}
 	
+	@Before(Tx.class)
 	public void batchup(){
 		Map<String, Object> result = getResultMap();
 		try {
@@ -102,7 +107,59 @@ public class FilterController extends BaseController {
 		}
 		render(new JsonRender(result).forIE());
 	}
-
+	
+	@Before(Tx.class)
+	public void batchEdit(){
+		Map<String, Object> result = getResultMap();
+		OutputStreamWriter ow = null;
+		BufferedWriter bw = null;
+		try {
+			File excelFile = getFile("scslb", SysConstants.IMG_DIR, SysConstants.MAX_POST_SIZE).getFile();
+			
+			String absolutePath = excelFile.getAbsolutePath();
+			XxlsPrint howto = new XxlsPrint();
+			howto.processOneSheet(absolutePath, 1);
+			List<List> data = howto.getMsg();
+			List<String> row = null;
+			File tempFile = File.createTempFile("上传结果_"+System.currentTimeMillis()/1000, ".txt", new File(SysConstants.IMG_DIR));
+			ow = new OutputStreamWriter(new FileOutputStream(tempFile), "UTF-8");
+			bw = new BufferedWriter(ow);
+			for (int i = 1; i < data.size(); i++) {
+				row = data.get(i);
+				String productNum = row.get(0);
+				String priceStr = row.get(1);
+				if(StrKit.notBlank(productNum,priceStr)){
+					BigDecimal price = new BigDecimal(priceStr);
+					boolean isUP = FilterModel.dao.updatePriceByName(price, productNum);
+					if(!isUP){
+						bw.write(productNum+"	数据库中不存在");
+						bw.newLine();
+					}
+				}
+			}
+			
+			result.put(RESULT, true);
+			result.put("f", tempFile.getName());
+			result.put(MESSAGE, "上传成功！");
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOG.debug("文件上传失败！" + e.getMessage());
+			result.put(RESULT, false);
+			result.put(MESSAGE, "上传失败！");
+		}finally{
+			try {
+				if(null!=bw){
+					bw.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		render(new JsonRender(result).forIE());
+	}
+	
+	
+	
 	private void dataHandler(List<String> row,int bid,int tid,String lyid) {
 		//编号
 		String snumb = row.get(bid);
@@ -160,6 +217,13 @@ public class FilterController extends BaseController {
 			result.put(MESSAGE, "价格更新失败！");
 		}
 		renderJson(result);
+	}
+	
+	public static void main(String[] args) throws Exception {
+		String str = "%E4%B8%8A%E4%BC%A0%E7%BB%93%E6%9E%9C_14338440626701421417820739167.txt";
+		String decode = URLDecoder.decode(str, "UTF-8");
+		System.out.println(decode);
+		
 	}
 	
 	

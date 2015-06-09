@@ -5,7 +5,7 @@
 	<sql id="pager">
 		<![CDATA[ 
 				select t1.*,t2.name as 'type',t3.name as 'series',t4.name as 'brand',t5.name as 'manf' from (
-					select id,name,ly_id,`status`,t_id from car where 1=1
+					select id,name,ly_id,`status`,t_id,price from car where 1=1
 					<% if(!isEmpty(name)){ %>
 					 AND name like #'%$name$%'#
 					<% } %>

@@ -4,7 +4,7 @@
 	<!-- 动态SQL处理 -->
 	<sql id="pager">
 		<![CDATA[ 
-				select t1.id,t1.`name` snumber,t1.ly_id,t1.recmd,t1.`status`,t2.`name` brand,t3.`name` type from (
+				select t1.id,t1.price,t1.`name` snumber,t1.ly_id,t1.recmd,t1.`status`,t2.`name` brand,t3.`name` type from (
 					select id,t_id,b_id,`name`,ly_id,price,recmd,`status` from filter_product where 1=1 
 					<% if(!isEmpty(snumber)){ %>
 					 AND `name` = #'$snumber$'#
@@ -52,7 +52,7 @@
 	<sql id="pager1">
 		<![CDATA[
 			from(
-				select t1.id,t1.`name` snumber,t1.ly_id,t1.recmd,t1.`status`,t2.`name` brand,t3.`name` type from (
+				select t1.id,t1.price,t1.`name` snumber,t1.ly_id,t1.recmd,t1.`status`,t2.`name` brand,t3.`name` type from (
 					select id,t_id,b_id,`name`,ly_id,price,recmd,`status` from filter_product where 1=1 
 					<% if(!isEmpty(snumber)){ %>
 					 AND `name` = #'$snumber$'#
