@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sqlGroup namespace="FilterPrice">
+	
+	<!-- 动态SQL处理 -->
+	<sql id="pager">
+		<![CDATA[
+			select t1.id,t1.price,t1.`status`,t1.recmd,t1.num,t2.name 'brand',t3.name 'type' from (
+				select * from filter_price where 1=1
+				<% if(!isEmpty(type)){ %>
+				 AND t_id = #$type$#
+				<% } %>
+				<% if(!isEmpty(brand)){ %>
+				 AND b_id = #$brand$#
+				<% } %>
+				<% if(!isEmpty(status)){ %>
+				 AND `status` = #$status$#
+				<% } %>
+				<% if(!isEmpty(recmd)){ %>
+				 AND `recmd` = #$recmd$#
+				<% } %>
+				limit #$begRow$#,#$pageSize$#
+			)t1
+			LEFT JOIN filter_brand t2 on t2.id = t1.b_id
+			LEFT JOIN filter_type t3 ON t3.id = t1.t_id
+		]]>
+	</sql>
+	<sql id="count">
+		<![CDATA[ 
+			select count(*) from filter_price where 1=1 
+			<% if(!isEmpty(type)){ %>
+			 AND t_id = #$type$#
+			<% } %>
+			<% if(!isEmpty(brand)){ %>
+			 AND b_id = #$brand$#
+			<% } %>
+			<% if(!isEmpty(status)){ %>
+			 AND `status` = #$status$#
+			<% } %>
+			<% if(!isEmpty(recmd)){ %>
+			 AND `recmd` = #$recmd$#
+			<% } %>
+		]]>
+	</sql>
+	
+	
+</sqlGroup>

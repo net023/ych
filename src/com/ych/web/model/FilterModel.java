@@ -22,9 +22,9 @@ public class FilterModel extends Model<FilterModel> {
 		/*LinkedList<Object> param = new LinkedList<Object>();
 		return dao.paginate(pager.getPageNo(), pager.getPageSize(),
 				" select * ",
-				SqlXmlKit.getSql("Filter.pager", pager.getParamsMap(), param),
+				SqlXmlKit.getSql("Filter.pager1", pager.getParamsMap(), param),
 				param.toArray());*/
-		return Pager.pageHandler("Filter.pager", "Filter.count", pager.getParamsMap(), pager.getParamsMap(), this);
+		return Pager.pageHandler("Filter.pager1", "Filter.count1", pager.getParamsMap(), pager.getParamsMap(), this);
 	}
 
 	public int batchDel(String ids) {
@@ -43,7 +43,7 @@ public class FilterModel extends Model<FilterModel> {
 	}
 	
 	public boolean updatePriceByName(BigDecimal price,String name){
-		return Db.update("update filter_product set price=? where name=?", price,name) >0;
+		return Db.update("update filter_product set price=?,`status`=0,recmd=0 where name=?", price,name) >0;
 	}
 
 }

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sqlGroup namespace="Oil">
+	
+	<!-- 动态SQL处理 -->
+	<sql id="pager">
+		<![CDATA[
+			from(
+				select t1.id,t1.fill,t1.ly_id,t1.`type`,t2.`name` etalon,t3.price,t4.`name` brand,t5.`name` model from (
+					select id,e_id,ly_id,fill,`type` from oil_product where 1=1 
+					<% if(!isEmpty(lyid)){ %>
+					 AND ly_id = #'$lyid$'#
+					<% } %>
+					<% if(!isEmpty(type)){ %>
+					 AND `type` = #$type$#
+					<% } %>
+					<% if(!isEmpty(etalon)){ %>
+					 AND e_id = #$etalon$#
+					<% } %>
+				)t1
+				JOIN oil_etalon t2 on t1.e_id = t2.id
+				<% if(!isEmpty(etalon)){ %>
+				 AND t2.id = #$etalon$#
+				<% } %>
+				JOIN oil_price t3 on t3.e_id=t1.e_id and t3.`type`=t1.`type` and t3.e_id=t2.id
+				<% if(!isEmpty(etalon)){ %>
+				 AND t3.e_id = #$etalon$#
+				<% } %>
+				<% if(!isEmpty(brand)){ %>
+				 AND t3.b_id = #$brand$#
+				<% } %>
+				JOIN oil_brand t4 ON t3.b_id = t4.id
+				<% if(!isEmpty(brand)){ %>
+				 AND t4.id = #$brand$#
+				<% } %>
+				JOIN oil_model t5 ON t5.id = t3.m_id and t5.b_id=t4.id
+				<% if(!isEmpty(model)){ %>
+				 AND t5.id = #$model$#
+				<% } %>
+			)t 
+		]]>
+	</sql>
+	
+	<sql id="count">
+		<![CDATA[ 
+			select count(*) from oil_product where 1=1 
+			<% if(!isEmpty(lyid)){ %>
+			 AND ly_id = #'$lyid$'#
+			<% } %>
+			<% if(!isEmpty(type)){ %>
+			 AND `type` = #$type$#
+			<% } %>
+			<% if(!isEmpty(brand)){ %>
+			 AND b_id = #$brand$#
+			<% } %>
+			<% if(!isEmpty(status)){ %>
+			 AND `status` = #$status$#
+			<% } %>
+			<% if(!isEmpty(recmd)){ %>
+			 AND `recmd` = #$recmd$#
+			<% } %>
+			<% if(!isEmpty(etalon)){ %>
+			 AND e_id = #$etalon$#
+			<% } %>
+		]]>
+	</sql>
+	
+</sqlGroup>

@@ -1,5 +1,6 @@
 package com.ych.web.model;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 
 import com.jfinal.plugin.activerecord.Db;
@@ -34,6 +35,10 @@ public class BrakingModel extends Model<BrakingModel> {
 
 	public boolean recmd(Integer id, Integer status) {
 		return Db.update("update braking_product set recmd = ? where id = ?", status, id) == 1;
+	}
+	
+	public boolean updatePriceByName(BigDecimal price,String name){
+		return Db.update("update braking_product set price=?,`status`=0,recmd=0 where name=?", price,name) >0;
 	}
 
 }

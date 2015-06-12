@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>四滤数据库管理</title>
+<title>机油数据库管理</title>
 <meta charset="UTF-8">
 <% include("/pager/common/quote.html"){} %>
 </head>
@@ -19,7 +19,17 @@
 								required:true,
 						        valueField:'id',
 						        textField:'name',
-						        data:${types}"
+						        data:[{id:'',name:'全部'},{id:1,name:'全合成'},{id:2,name:'半合成'},{id:3,name:'矿物油'}]"
+						        style="width: 155px;">
+                		</span>
+                		<span class="spacing">
+                			<label>粘度(规格)：</label>
+	                		<input id="etalon" name="etalon" class="easyui-combobox" data-options="
+								editable:false,
+								required:false,
+						        valueField:'id',
+						        textField:'name',
+						        data:${etalon}"
 						        style="width: 155px;">
                 		</span>
                 		<span class="spacing">
@@ -33,8 +43,14 @@
 						        style="width: 155px;">
                 		</span>
                 		<span class="spacing">
-                			<label>编号：</label>
-                			<input type="text" name="snumber" >
+                			<label>型号：</label>
+	                		<input id="model" name="model" class="easyui-combobox" data-options="
+								editable:false,
+								required:false,
+						        valueField:'id',
+						        textField:'name',
+						        data:${models}"
+						        style="width: 155px;">
                 		</span>
                 		<span class="spacing">
                 			<label>力洋ID：</label>
@@ -43,7 +59,7 @@
 		                <span class="spacing">
 		                	<input type="submit" id="queryButton" value="查询"/>
 		                </span>
-		                 <span class="spacing">
+		                <span class="spacing">
 		              		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		                	<input type="button" id="upPic" value="上传图片">
 		                </span>
@@ -55,34 +71,24 @@
 		              		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		                	<input type="button" id="lookPrice" value="机油价格表">
 		                </span>
-		               <!--  <span>
-		               		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		                	<input type="button" id="xzslb" value="下载模版">
-		                </span>
-		                <span>
-		                	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		             	    <label>导入excel价格表批量修改：</label>
-		                	<input type="file" id="scslb" name="scslb">
-		                </span> -->
                 </form>
-                <!-- <span>
+               <!--  <span>
               		<label>导入四滤库excel：</label>
                 	<input type="file" name="batchup" id="batchup" value="批量导入">
                 </span> -->
             </div>
         </div>
         
-        <table id="grid"  data-options="rownumbers:true,pagination:true,url:'filter4/list'" title="四滤数据库列表">
+        <table id="grid"  data-options="rownumbers:true,pagination:true,url:'oil/list'" title="机油数据库列表">
             <thead>
             	<th data-options="field:'id',hidden:true">ID</th>
-                <th data-options="field:'type',width:80,resizable:true,align:'left'">类型</th>
-                <th data-options="field:'brand',width:80,resizable:true,align:'left'">品牌</th>
-                <th data-options="field:'num',width:80,resizable:true,align:'left'">编号</th>
+                <th data-options="field:'type',width:80,resizable:true,align:'left',formatter:formatter.type">类型</th>
+                <th data-options="field:'etalon',width:80,resizable:true,align:'left'">粘度(规格)</th>
                 <th data-options="field:'ly_id',width:80,resizable:true,align:'left'">力洋ID</th>
                 <th data-options="field:'price',width:80,resizable:true,align:'left'">价格</th>
-                <!-- <th data-options="field:'status',width:160,resizable:true,align:'left',formatter:formatter.status">状态</th>
-                <th data-options="field:'recmd',width:160,resizable:true,align:'left',formatter:formatter.recmd">推荐</th>
-                <th data-options="field:'editPrice',width:160,resizable:true,align:'left',formatter:formatter.editPrice">修改价格</th> -->
+                <th data-options="field:'fill',width:80,resizable:true,align:'left'">加注量</th>
+                <th data-options="field:'brand',width:80,resizable:true,align:'left'">厂商</th>
+                <th data-options="field:'model',width:80,resizable:true,align:'left'">型号</th>
             </thead>
         </table>
     </div>
@@ -99,33 +105,6 @@
     		</form>
     	</div>
     	
-    	<div id="uploadDialog" style="width:410px;height:180px;padding-left:30px;" data-options="resizable:false,modal:true,closed: true">
-    		<span>
-	    			<label>品牌</label>
-	    			<input id="pp"  class="easyui-combobox" data-options="
-									editable:false,
-									required:true,
-							        valueField:'id',
-							        textField:'name',
-							        data:${brands2}"
-							        style="width: 155px;">
-    			</span>
-    			<span>
-	    			<label>类型</label>
-	    			<input id="lx" class="easyui-combobox" data-options="
-									editable:false,
-									required:true,
-							        valueField:'id',
-							        textField:'name',
-							        data:${types2}"
-							        style="width: 155px;">
-    			</span>
-    			<span>
-					<label>选择上传excel</label>
-	    			<input id="upFile1" name="upFile1" type="file">
-    			</span>
-    	</div>
-    	
     	<div id="picDialog" style="width: 650px;height: 500px;padding-left: 30px;" data-options="resizable:false,modal:true,closed: true">
     			<span>
 	    			<label>品牌</label>
@@ -134,17 +113,35 @@
 									required:true,
 							        valueField:'id',
 							        textField:'name',
-							        data:${brands2}"
+							        data:${pinpai}"
 							        style="width: 155px;">
     			</span>
     			<span>
-	    			<label>类型</label>
-	    			<input id="leixin" class="easyui-combobox" data-options="
+	    			<label>型号</label>
+	    			<input id="m1" class="easyui-combobox" data-options="
+									editable:false,
+									required:true,
+							        valueField:'id',
+							        textField:'name'"
+							        style="width: 155px;">
+    			</span>
+    			<span>
+	    			<label>粘度(规格)</label>
+	    			<input id="guige1" class="easyui-combobox" data-options="
+									editable:false,
+									required:true,
+							        valueField:'id',
+							        textField:'name'"
+							        style="width: 155px;">
+    			</span>
+    			<span>
+	    			<label>图片类型</label>
+	    			<input id="pict" class="easyui-combobox" data-options="
 									editable:false,
 									required:true,
 							        valueField:'id',
 							        textField:'name',
-							        data:${types2}"
+							        data:[{id:1,name:'1L'},{id:2,name:'4L'}]"
 							        style="width: 155px;">
     			</span>
     			<span>
@@ -162,17 +159,35 @@
 									required:true,
 							        valueField:'id',
 							        textField:'name',
-							        data:${brands2}"
+							        data:${pinpai}"
 							        style="width: 155px;">
     			</span>
     			<span>
-	    			<label>类型</label>
-	    			<input id="lleixin" class="easyui-combobox" data-options="
+	    			<label>型号</label>
+	    			<input id="m2" class="easyui-combobox" data-options="
+									editable:false,
+									required:true,
+							        valueField:'id',
+							        textField:'name'"
+							        style="width: 155px;">
+    			</span>
+    			<span>
+	    			<label>粘度(规格)</label>
+	    			<input id="guige2" class="easyui-combobox" data-options="
+									editable:false,
+									required:true,
+							        valueField:'id',
+							        textField:'name'"
+							        style="width: 155px;">
+    			</span>
+    			<span>
+	    			<label>图片类型</label>
+	    			<input id="lpict" class="easyui-combobox" data-options="
 									editable:false,
 									required:true,
 							        valueField:'id',
 							        textField:'name',
-							        data:${types2}"
+							        data:[{id:1,name:'1L'},{id:2,name:'4L'}]"
 							        style="width: 155px;">
     			</span>
 				<h5>图片</h5>
@@ -192,7 +207,17 @@
 									required:true,
 							        valueField:'id',
 							        textField:'name',
-							        data:${types}"
+							        data:[{id:'',name:'全部'},{id:1,name:'全合成'},{id:2,name:'半合成'},{id:3,name:'矿物油'}]"
+							        style="width: 155px;">
+	                		</span>
+	                		<span class="spacing">
+	                			<label>粘度(规格)：</label>
+		                		<input id="priceMgEtalon" name="etalon" class="easyui-combobox" data-options="
+									editable:false,
+									required:false,
+							        valueField:'id',
+							        textField:'name',
+							        data:${etalon}"
 							        style="width: 155px;">
 	                		</span>
 	                		<span class="spacing">
@@ -203,6 +228,16 @@
 							        valueField:'id',
 							        textField:'name',
 							        data:${brands}"
+							        style="width: 155px;">
+	                		</span>
+	                		<span class="spacing">
+	                			<label>型号：</label>
+		                		<input id="priceMgModel" name="model" class="easyui-combobox" data-options="
+									editable:false,
+									required:false,
+							        valueField:'id',
+							        textField:'name',
+							        data:${models}"
 							        style="width: 155px;">
 	                		</span>
 	                		<span class="spacing">
@@ -234,21 +269,21 @@
 			                </span>
 			                <span>
 			                	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			             	   <!--  <label>导入excel价格表批量修改：</label>
-			                	<input type="file" id="scslb" name="scslb"> -->
-			                	<input type="button" id="scslb" value="导入excel价格表批量修改">
+			             	    <label>导入excel价格表批量修改：</label>
+			                	<input type="file" id="scslb" name="scslb">
 			                </span>
 	                </form>
 	            </div>
 	        </div>
 	        
-	        <table id="priceMgGrid"  data-options="rownumbers:true,pagination:true,url:'filter4/priceList'" title="四滤价格表">
+	        <table id="priceMgGrid"  data-options="rownumbers:true,pagination:true,url:'oil/priceList'" title="机油价格表">
 	            <thead>
 	            	<th data-options="field:'id',hidden:true">ID</th>
-	                <th data-options="field:'type',width:80,resizable:true,align:'left'">类型</th>
+	                <th data-options="field:'type',width:80,resizable:true,align:'left',formatter:formatter.type">类型</th>
+	                <th data-options="field:'etalon',width:80,resizable:true,align:'left'">粘度(规格)</th>
 	                <th data-options="field:'price',width:80,resizable:true,align:'left'">价格</th>
 	                <th data-options="field:'brand',width:80,resizable:true,align:'left'">品牌</th>
-	                <th data-options="field:'num',width:80,resizable:true,align:'left'">编号</th>
+	                <th data-options="field:'model',width:80,resizable:true,align:'left'">型号</th>
 	                <th data-options="field:'status',width:160,resizable:true,align:'left',formatter:formatter.status">状态</th>
               	    <th data-options="field:'recmd',width:160,resizable:true,align:'left',formatter:formatter.recmd">推荐</th>
                		<th data-options="field:'editPrice',width:160,resizable:true,align:'left',formatter:formatter.editPrice">修改价格</th>

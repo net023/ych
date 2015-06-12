@@ -1,7 +1,6 @@
 package com.ych.web.controller;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Date;
 import java.util.Map;

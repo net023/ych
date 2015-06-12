@@ -1,6 +1,10 @@
 package com.ych.web.controller;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +43,8 @@ public class BrakingController extends BaseController {
 		Pager pager = createPager();
 		pager.addParam("brand", getParaToInt("brand"));
 		pager.addParam("type", getParaToInt("type"));
+		pager.addParam("status", getParaToInt("status"));
+		pager.addParam("recmd", getParaToInt("recmd"));
 		if(StrKit.notBlank(getPara("snumber"))){
 			pager.addParam("snumber", getPara("snumber").trim());
 		}
@@ -51,6 +57,7 @@ public class BrakingController extends BaseController {
 		renderJson();
 	}
 	
+	@Before(Tx.class)
 	public void batchup(){
 		Map<String, Object> result = getResultMap();
 		try {
@@ -121,6 +128,58 @@ public class BrakingController extends BaseController {
 			}
 		}
 	}
+	
+	@Before(Tx.class)
+	public void batchEdit(){
+		Map<String, Object> result = getResultMap();
+		OutputStreamWriter ow = null;
+		BufferedWriter bw = null;
+		try {
+			File excelFile = getFile("scslb", SysConstants.IMG_DIR, SysConstants.MAX_POST_SIZE).getFile();
+			
+			String absolutePath = excelFile.getAbsolutePath();
+			XxlsPrint howto = new XxlsPrint();
+			howto.processOneSheet(absolutePath, 1);
+			List<List> data = howto.getMsg();
+			List<String> row = null;
+			File tempFile = File.createTempFile("上传结果_"+System.currentTimeMillis()/1000, ".txt", new File(SysConstants.IMG_DIR));
+			ow = new OutputStreamWriter(new FileOutputStream(tempFile), "UTF-8");
+			bw = new BufferedWriter(ow);
+			for (int i = 1; i < data.size(); i++) {
+				row = data.get(i);
+				String productNum = row.get(0);
+				String priceStr = row.get(1);
+				if(StrKit.notBlank(productNum,priceStr)){
+					BigDecimal price = new BigDecimal(priceStr);
+					boolean isUP = BrakingModel.dao.updatePriceByName(price, productNum);
+					if(!isUP){
+						bw.write(productNum+"	数据库中不存在");
+						bw.newLine();
+					}
+				}
+			}
+			
+			result.put(RESULT, true);
+			result.put("f", tempFile.getName());
+			result.put(MESSAGE, "上传成功！");
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOG.debug("文件上传失败！" + e.getMessage());
+			result.put(RESULT, false);
+			result.put(MESSAGE, "上传失败！");
+		}finally{
+			try {
+				if(null!=bw){
+					bw.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		render(new JsonRender(result).forIE());
+	}
+	
+	
 	
 	@Before(Tx.class)
 	public void modify(){

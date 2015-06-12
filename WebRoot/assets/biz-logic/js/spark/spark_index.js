@@ -1,4 +1,9 @@
 $(function() {
+	var grid = $('#grid')._datagrid({
+		checkOnSelect:false,
+        selectOnCheck:false
+	});
+	
 	$("#brand").combobox({
 		onSelect:function(record){
 			if(record.id){
@@ -60,12 +65,6 @@ $(function() {
 		}
 	});
 	
-	var grid = $('#grid')._datagrid({
-		checkOnSelect:false,
-        selectOnCheck:false
-	});
-	
-	
 	$('#priceDialog').dialog({
 		buttons:[{text:'保存',handler:function(){
 			if(!$('#priceForm').form('validate')){return;}
@@ -80,6 +79,91 @@ $(function() {
 		}},{text:'关闭',handler:function(){$('#priceDialog').dialog('close');}}]
 	});
 	
+	$("#xzslb").click(function(){
+		var fileName = encodeURIComponent(encodeURIComponent("火花塞价格表--模版.xlsx"));
+		window.open("file/df?fn="+fileName);
+	});
+	
+	var ii;
+	$("#scslb").fileupload({
+		url:'spark/batchEdit',
+		dataType: 'json',
+		done:function(e,result){
+			layer.close(ii);
+			if(result.result.r){
+				$("#grid").datagrid('reload');
+				var fileName = encodeURIComponent(encodeURIComponent(result.result.f));
+				asyncbox.open({
+					title:result.result.m,
+					html:'<a href="#" onclick="javascript:(window.open(\'file/df2?fn='+fileName+'\'))">点击下载上传结果信息</a>',
+					width : 200,
+					height : 200
+				});
+			}else{
+				$.messager.alert("上传失败",result.result.m);
+			}
+		},
+		fail:function(){
+			layer.close(ii);
+			$.messager.alert("错误提示","系统异常请联系管理员。");
+		},
+		add: function (e, data) {
+		   ii = layer.load();
+		   data.submit();
+        }
+	});
+	
+	
+	$('#picDialog').dialog({
+		buttons:[{text:'关闭',handler:function(){$('#picDialog').dialog('close');$("#upf").empty();}}]
+	});
+	$('#lookDialog').dialog({
+		buttons:[{text:'关闭',handler:function(){$('#lookDialog').dialog('close');$("#tp").empty();}}]
+	});
+	
+	
+	$("#upPic").click(function(){
+		var val = $("#pinpai").combobox("getData");
+		$("#pinpai").combobox("select",val[0].id);
+		$('#picDialog').dialog('open').dialog('setTitle','上传图片');
+	});
+	$("#lookPic").click(function(){
+		var val = $("#lpinpai").combobox("getData");
+		$("#lpinpai").combobox("select",val[0].id);
+		$('#lookDialog').dialog('open').dialog('setTitle','查看图片');
+	});
+	
+	$("#upFile").fileupload({
+		 url:'spark/upload',
+		 dataType: 'json',
+		 add:function(e,data){
+			 var brand = $("#pinpai").combobox("getValue");
+			 data.url = 'spark/upload?brand='+brand;
+			 data.submit();
+		 },
+		 done:function(e,result){
+			 $("#upf").empty();
+			 if(result.result.r){
+				var html = '<image src="file/download?fID='+result.result.fID+'" style="width:320px;height:230px"/>';
+				$("#upf").append(html);
+				$.messager.alert("上传完成",result.result.m);
+			 }else{
+				$.messager.alert("上传失败",result.result.m);
+			 }
+	    },
+	    fail:function(){
+	    	$.messager.alert("错误提示","系统异常请联系管理员。");
+	    }
+	 });
+	
+	$("#lpinpai").combobox({
+		onSelect:function(record){
+			var brand = $("#lpinpai").combobox("getValue");
+			var html = '<image src="spark/download?brand='+brand+'" style="width:320px;height:230px"/>';
+			$("#tp").empty();
+			$("#tp").append(html);
+		}
+	});
     
 });
 var formatter = {

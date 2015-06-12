@@ -21,6 +21,12 @@
 					<% if(!isEmpty(brand)){ %>
 					 AND b_id = #$brand$#
 					<% } %>
+					<% if(!isEmpty(status)){ %>
+					 AND `status` = #$status$#
+					<% } %>
+					<% if(!isEmpty(recmd)){ %>
+					 AND `recmd` = #$recmd$#
+					<% } %>
 					limit #$begRow$#,#$pageSize$#
 				)t1
 				LEFT JOIN spark_series t2 ON t1.s_id=t2.id
@@ -54,6 +60,12 @@
 			<% } %>
 			<% if(!isEmpty(brand)){ %>
 			 AND b_id = #$brand$#
+			<% } %>
+			<% if(!isEmpty(status)){ %>
+			 AND `status` = #$status$#
+			<% } %>
+			<% if(!isEmpty(recmd)){ %>
+			 AND `recmd` = #$recmd$#
 			<% } %>
 		]]>
 	</sql>

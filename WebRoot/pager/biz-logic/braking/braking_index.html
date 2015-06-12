@@ -33,6 +33,26 @@
 						        style="width: 155px;">
                 		</span>
                 		<span class="spacing">
+                			<label>状态：</label>
+	                		<input id="status" name="status" class="easyui-combobox" data-options="
+								editable:false,
+								required:false,
+						        valueField:'id',
+						        textField:'name',
+						        data:[{id:'',name:'全部'},{id:0,name:'已启用'},{id:1,name:'已禁用'}]"
+						        style="width: 155px;">
+                		</span>
+                		<span class="spacing">
+                			<label>推荐：</label>
+	                		<input id="recmd" name="recmd" class="easyui-combobox" data-options="
+								editable:false,
+								required:false,
+						        valueField:'id',
+						        textField:'name',
+						        data:[{id:'',name:'全部'},{id:0,name:'推荐'},{id:1,name:'不推荐'}]"
+						        style="width: 155px;">
+                		</span>
+                		<span class="spacing">
                 			<label>编号：</label>
                 			<input type="text" name="snumber" >
                 		</span>
@@ -42,6 +62,15 @@
                 		</span>
 		                <span class="spacing">
 		                	<input type="submit" id="queryButton" value="查询"/>
+		                </span>
+		                 <span>
+		               		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		                	<input type="button" id="xzslb" value="下载模版">
+		                </span>
+		                <span>
+		                	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		             	    <label>导入excel价格表批量修改：</label>
+		                	<input type="file" id="scslb" name="scslb">
 		                </span>
                 </form>
                <!--  <span>

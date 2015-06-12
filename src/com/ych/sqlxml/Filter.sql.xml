@@ -18,6 +18,12 @@
 					<% if(!isEmpty(brand)){ %>
 					 AND b_id = #$brand$#
 					<% } %>
+					<% if(!isEmpty(status)){ %>
+					 AND `status` = #$status$#
+					<% } %>
+					<% if(!isEmpty(recmd)){ %>
+					 AND `recmd` = #$recmd$#
+					<% } %>
 					limit #$begRow$#,#$pageSize$#
 				)t1
 				LEFT JOIN filter_brand t2 ON t1.b_id = t2.id
@@ -45,37 +51,54 @@
 			<% if(!isEmpty(brand)){ %>
 			 AND b_id = #$brand$#
 			<% } %>
+			<% if(!isEmpty(status)){ %>
+			 AND `status` = #$status$#
+			<% } %>
+			<% if(!isEmpty(recmd)){ %>
+			 AND `recmd` = #$recmd$#
+			<% } %>
 		]]>
 	</sql>
 	
 	<!-- 动态SQL处理 -->
 	<sql id="pager1">
 		<![CDATA[
-			from(
-				select t1.id,t1.price,t1.`name` snumber,t1.ly_id,t1.recmd,t1.`status`,t2.`name` brand,t3.`name` type from (
-					select id,t_id,b_id,`name`,ly_id,price,recmd,`status` from filter_product where 1=1 
-					<% if(!isEmpty(snumber)){ %>
-					 AND `name` = #'$snumber$'#
-					<% } %>
-					<% if(!isEmpty(lyid)){ %>
-					 AND ly_id = #'$lyid$'#
-					<% } %>
-					<% if(!isEmpty(type)){ %>
-					 AND t_id = #$type$#
-					<% } %>
-					<% if(!isEmpty(brand)){ %>
-					 AND b_id = #$brand$#
-					<% } %>
-				)t1
-				LEFT JOIN filter_brand t2 ON t1.b_id = t2.id
-				<% if(!isEmpty(brand)){ %>
-				 AND t2.id = #$brand$#
+			select t1.id,t1.ly_id,t1.num,t3.name 'type',t2.name 'brand',t4.price from (
+				select id,t_id,b_id,num,ly_id from filter_product where 1=1 
+				<% if(!isEmpty(snumber)){ %>
+				 AND num = #'$snumber$'#
 				<% } %>
-				LEFT JOIN filter_type t3 on t1.t_id = t3.id
+				<% if(!isEmpty(lyid)){ %>
+				 AND ly_id = #'$lyid$'#
+				<% } %>
 				<% if(!isEmpty(type)){ %>
-				 AND t3.id = #$type$#
+				 AND t_id = #$type$#
 				<% } %>
-			)t 
+				<% if(!isEmpty(brand)){ %>
+				 AND b_id = #$brand$#
+				<% } %>
+				limit #$begRow$#,#$pageSize$#
+			)t1
+			LEFT JOIN filter_brand t2 ON t1.b_id = t2.id
+			LEFT JOIN filter_type t3 on t1.t_id = t3.id
+			LEFT JOIN filter_price t4 ON t1.num=t4.num and t2.id=t4.b_id and t3.id=t4.t_id
+		]]>
+	</sql>
+	<sql id="count1">
+		<![CDATA[ 
+			select count(*) from filter_product where 1=1 
+			<% if(!isEmpty(snumber)){ %>
+			 AND num = #'$snumber$'#
+			<% } %>
+			<% if(!isEmpty(lyid)){ %>
+			 AND ly_id = #'$lyid$'#
+			<% } %>
+			<% if(!isEmpty(type)){ %>
+			 AND t_id = #$type$#
+			<% } %>
+			<% if(!isEmpty(brand)){ %>
+			 AND b_id = #$brand$#
+			<% } %>
 		]]>
 	</sql>
 	

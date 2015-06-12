@@ -18,6 +18,12 @@
 					<% if(!isEmpty(brand)){ %>
 					 AND b_id = #$brand$#
 					<% } %>
+					<% if(!isEmpty(status)){ %>
+					 AND `status` = #$status$#
+					<% } %>
+					<% if(!isEmpty(recmd)){ %>
+					 AND `recmd` = #$recmd$#
+					<% } %>
 					limit #$begRow$#,#$pageSize$#
 				)t1
 				LEFT JOIN braking_brand t2 ON t1.b_id = t2.id
@@ -44,6 +50,12 @@
 			<% } %>
 			<% if(!isEmpty(brand)){ %>
 			 AND b_id = #$brand$#
+			<% } %>
+			<% if(!isEmpty(status)){ %>
+			 AND `status` = #$status$#
+			<% } %>
+			<% if(!isEmpty(recmd)){ %>
+			 AND `recmd` = #$recmd$#
 			<% } %>
 		]]>
 	</sql>

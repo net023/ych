@@ -6,7 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
-import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -28,56 +28,60 @@ import com.ych.tools.ModelTools;
 import com.ych.tools.SysConstants;
 import com.ych.tools.excel.XxlsPrint;
 import com.ych.web.model.FileModel;
-import com.ych.web.model.FilterBrandModel;
-import com.ych.web.model.FilterModel;
-import com.ych.web.model.FilterPicModel;
-import com.ych.web.model.FilterPriceModel;
-import com.ych.web.model.FilterTypeModel;
+import com.ych.web.model.OilBrandModel;
+import com.ych.web.model.OilEtalonModel;
+import com.ych.web.model.OilModel;
+import com.ych.web.model.OilModelModel;
+import com.ych.web.model.OilPicModel;
+import com.ych.web.model.OilPriceModel;
 
-@Control(controllerKey = "/filter4")
-public class FilterController extends BaseController {
-	private static Logger LOG = Logger.getLogger(FilterController.class);
+@Control(controllerKey = "/oil")
+public class OilController extends BaseController {
+	private static Logger LOG = Logger.getLogger(OilController.class);
 
 	public void index() {
 		try {
-			setAttr("brands", ModelTools.putFirstDataRender("id", "name", "", "全部", FilterBrandModel.dao.getAll()));
-			setAttr("types", ModelTools.putFirstDataRender("id", "name", "", "全部", FilterTypeModel.dao.getAll()));
-			setAttr("brands2", JsonKit.toJson(FilterBrandModel.dao.getAll()).replace("\"", "'"));
-			setAttr("types2", JsonKit.toJson(FilterTypeModel.dao.getAll()).replace("\"", "'"));
+			setAttr("brands", ModelTools.putFirstDataRender("id", "name", "", "全部", OilBrandModel.dao.getAll()));
+			setAttr("pinpai", JsonKit.toJson(OilBrandModel.dao.getAll()).replace("\"", "'"));
+			setAttr("etalon", ModelTools.putFirstDataRender("id", "name", "", "全部", OilEtalonModel.dao.getAll()));
+			setAttr("models", ModelTools.putFirstDataRender("id", "name", "", "全部", OilModelModel.dao.getAll()));
 		} catch (Exception e) {
-			LOG.debug("spark_index 失败!" + e.getMessage());
+			LOG.debug("oil_index 失败!" + e.getMessage());
 		}
-		render("filter/filter_index");
-	}
-	
-	public void list() {
-		Pager pager = createPager();
-		pager.addParam("brand", getParaToInt("brand"));
-		pager.addParam("type", getParaToInt("type"));
-		if(StrKit.notBlank(getPara("snumber"))){
-			pager.addParam("snumber", getPara("snumber").trim());
-		}
-		if(StrKit.notBlank(getPara("lyid"))){
-			pager.addParam("lyid", getPara("lyid").trim());
-		}
-		Page<?> page = FilterModel.dao.getPager(pager);
-		setAttr("total", page.getTotalRow());
-		setAttr("rows", page.getList());
-		renderJson();
+		render("oil/oil_index");
 	}
 	
 	public void priceList() {
 		Pager pager = createPager();
 		pager.addParam("brand", getParaToInt("brand"));
 		pager.addParam("type", getParaToInt("type"));
+		pager.addParam("etalon", getParaToInt("etalon"));
+		pager.addParam("model", getParaToInt("model"));
 		pager.addParam("status", getParaToInt("status"));
 		pager.addParam("recmd", getParaToInt("recmd"));
 		
-		Page<?> page = FilterPriceModel.dao.getPager(pager);
+		Page<?> page = OilPriceModel.dao.getPager(pager);
 		setAttr("total", page.getTotalRow());
 		setAttr("rows", page.getList());
 		renderJson();
 	}
+	
+	public void list(){
+		Pager pager = createPager();
+		pager.addParam("brand", getParaToInt("brand"));
+		pager.addParam("type", getParaToInt("type"));
+		pager.addParam("etalon", getParaToInt("etalon"));
+		pager.addParam("model", getParaToInt("model"));
+		
+		if(StrKit.notBlank(getPara("lyid"))){
+			pager.addParam("lyid", getPara("lyid").trim());
+		}
+		Page<?> page = OilModel.dao.getPager(pager);
+		setAttr("total", page.getTotalRow());
+		setAttr("rows", page.getList());
+		renderJson();
+	}
+	
 	
 	
 	@Before(Tx.class)
@@ -87,35 +91,100 @@ public class FilterController extends BaseController {
 			File excelFile = getFile("batchup", SysConstants.IMG_DIR, SysConstants.MAX_POST_SIZE).getFile();
 			
 			String absolutePath = excelFile.getAbsolutePath();
-			for (int ii = 2; ii < 5; ii++) {
-				XxlsPrint howto = new XxlsPrint();
-				howto.processOneSheet(absolutePath, ii);
-				List<List> data = howto.getMsg();
-				List<String> row = null;
-				for (int i = 2; i < data.size(); i++) {
-					row = data.get(i);
-					String lyid = null;
-					if(row.size()<2){continue;}
-					for (int j = 0; j < row.size(); j++) {
-						switch(j){
-						case 0:
-							//保存力洋ID
-							lyid = row.get(j);
-							continue;
-						case 1:
-							//保存曼牌
-							dataHandler(row,j,ii,lyid);
-							continue;
-						case 2:
-							//保存豹王
-							dataHandler(row,j,ii,lyid);
-							continue;
-						case 3:
-							//保存耐诺思
-							dataHandler(row,j,ii,lyid);
-							continue;
+			XxlsPrint howto = new XxlsPrint();
+			howto.processOneSheet(absolutePath, 1);
+			List<List> data = howto.getMsg();
+			List<String> row = null;
+			for (int i = 2; i < data.size(); i++) {
+				row = data.get(i);
+				if(row.size()<=2){continue;}
+				String lyid = null;
+				Double fill = null;
+				Integer type = null;
+				//规格
+				List<OilEtalonModel> etalons = new ArrayList<OilEtalonModel>();
+				System.out.println(row);
+				for (int j = 0; j < row.size(); j++) {
+					switch(j){
+					case 0:
+						//保存力洋ID
+						lyid = row.get(j);
+						continue;
+					case 1:
+						//保存加注量
+						String fillStr = row.get(j);
+						String sf = null;
+						if(StrKit.notBlank(fillStr)){
+							//4.7(BJH);4.5(BWG)
+							if(fillStr.indexOf(";")!=-1){
+								String ss = fillStr.split(";")[0];
+								//4.0(4JB1TC)
+								if(ss.indexOf("(")!=-1){
+									sf = ss.substring(0, ss.indexOf("("));
+								}else{
+									sf = ss;
+								}
+							}else{
+								//3.5-4.0(4JB1TC)  4.0(4JB1TC)  3.0(DA462-1A)
+								int index = fillStr.indexOf("-");
+								
+								int index2 = fillStr.indexOf("(");
+								if(index<index2){//index -1
+									//3.5-4.0(4JB1TC)  4.0(4JB1TC)
+									if(index!=-1){
+										String sbStr = fillStr.substring(index+1);
+										if(sbStr.indexOf("(")!=-1){
+											sf = sbStr.substring(0, sbStr.indexOf("("));
+										}else{
+											sf = sbStr;
+										}
+									}else{
+										if(fillStr.indexOf("(")!=-1){
+											sf = fillStr.substring(0, fillStr.indexOf("("));
+										}else{
+											sf = fillStr;
+										}
+									}
+								}else if(index>index2){//index2 -1
+									//3.0(DA462-1A)  3.0-3.5
+									if(index2!=-1){
+										sf = fillStr.substring(0, fillStr.indexOf("("));
+									}else{
+										sf = fillStr.substring(index+1);
+									}
+								}else{
+									sf = fillStr;
+								}
+								
+								
+							}
 						}
+						if(StrKit.notBlank(sf)){
+							fill = Double.valueOf(sf);
+						}
+						continue;
+					case 2:
+						//保存基础油类型
+						String typeStr = row.get(j);
+						if("全合成".equals(typeStr)){
+							type=1;
+						}else if("半合成".equals(typeStr)){
+							type=2;
+						}else{
+							type=3;
+						}
+						continue;
+					case 3:continue;
+					case 4:
+						//保存规格
+						dataHandler(row.get(j),etalons);
+						continue;
 					}
+				}
+				for (OilEtalonModel oile : etalons) {
+					//机油
+					OilModel model = new OilModel().set("ly_id", lyid).set("fill", fill).set("type", type).set("e_id", oile.getInt("id"));
+					model.save();
 				}
 			}
 			
@@ -130,15 +199,30 @@ public class FilterController extends BaseController {
 		render(new JsonRender(result).forIE());
 	}
 	
+	private void dataHandler(String etalon, List<OilEtalonModel> etalons) {
+		//5W-20;5W-30
+		String[] es = etalon.split(";");
+		for (String e : es) {
+			//5W-30()
+			if(e.indexOf("(")!=-1){
+				e = e.substring(0, e.indexOf("("));
+			}
+			OilEtalonModel model = OilEtalonModel.dao.getModelByName(e);
+			if(null==model){
+				model=new OilEtalonModel();
+				model.set("name", e).save();
+			}
+			etalons.add(model);
+		}
+	}
+
 	@Before(Tx.class)
 	public void batchEdit(){
 		Map<String, Object> result = getResultMap();
 		OutputStreamWriter ow = null;
 		BufferedWriter bw = null;
 		try {
-			File excelFile = getFile("upFile1", SysConstants.IMG_DIR, SysConstants.MAX_POST_SIZE).getFile();
-			Integer brand = getParaToInt("brand");
-			Integer type = getParaToInt("type");
+			File excelFile = getFile("scslb", SysConstants.IMG_DIR, SysConstants.MAX_POST_SIZE).getFile();
 			
 			String absolutePath = excelFile.getAbsolutePath();
 			XxlsPrint howto = new XxlsPrint();
@@ -152,24 +236,15 @@ public class FilterController extends BaseController {
 				row = data.get(i);
 				String productNum = row.get(0);
 				String priceStr = row.get(1);
-				System.out.println(row);
 				if(StrKit.notBlank(productNum,priceStr)){
 					BigDecimal price = new BigDecimal(priceStr);
-					FilterPriceModel model = FilterPriceModel.dao.getModelByBrandTypeNum(brand, type, productNum);
-					if(null!=model){
-						model.set("price", price).update();
-					}else{
-						new FilterPriceModel().set("b_id", brand).set("t_id", type).set("price", price).set("num", productNum).save();
-					}
-					/*boolean isUP = FilterModel.dao.updatePriceByName(price, productNum);
+					boolean isUP = OilModel.dao.updatePriceByName(price, productNum);
 					if(!isUP){
 						bw.write(productNum+"	数据库中不存在");
 						bw.newLine();
-					}*/
+					}
 				}
 			}
-			
-			bw.write("恭喜你上传成功了!!");
 			
 			result.put(RESULT, true);
 			result.put("f", tempFile.getName());
@@ -192,27 +267,11 @@ public class FilterController extends BaseController {
 	}
 	
 	
-	
-	private void dataHandler(List<String> row,int bid,int tid,String lyid) {
-		//编号
-		String snumb = row.get(bid);
-		//---
-		if(StrKit.notBlank(snumb)){
-			String[] snumbs = snumb.split(";");
-			for (int k = 0; k < snumbs.length; k++) {
-				if(StrKit.notBlank(snumbs[k])&&!snumbs[k].equals("null")){
-					FilterModel model = new FilterModel();
-					model.set("name", snumbs[k]).set("ly_id", lyid).set("t_id", tid).set("b_id", bid).save();
-				}
-			}
-		}
-	}
-	
 	@Before(Tx.class)
 	public void modify(){
 		Integer id = getParaToInt("id");
 		Integer status = getParaToInt("state");
-		boolean b = FilterPriceModel.dao.modify(id, status);
+		boolean b = OilPriceModel.dao.modify(id, status);
 		Map<String, Object> result = getResultMap();
 		result.put(RESULT, b);
 		result.put(MESSAGE, b ? "保存成功" : "保存失败，请联系管理员！");
@@ -222,7 +281,7 @@ public class FilterController extends BaseController {
 	public void recmd(){
 		Integer id = getParaToInt("id");
 		Integer status = getParaToInt("state");
-		boolean b = FilterPriceModel.dao.recmd(id, status);
+		boolean b = OilPriceModel.dao.recmd(id, status);
 		Map<String, Object> result = getResultMap();
 		result.put(RESULT, b);
 		result.put(MESSAGE, b ? "保存成功" : "保存失败，请联系管理员！");
@@ -236,7 +295,7 @@ public class FilterController extends BaseController {
 		try {
 			String price = getPara("price");
 			Integer uid = getParaToInt("id");
-			boolean isUpdate = FilterPriceModel.dao.findById(uid).set("price", new BigDecimal(price)).update();
+			boolean isUpdate = OilPriceModel.dao.findById(uid).set("price", new BigDecimal(price)).update();
 			if(isUpdate){
 				result.put(RESULT, true);
 				result.put(MESSAGE, "价格更新成功！");
@@ -252,7 +311,6 @@ public class FilterController extends BaseController {
 		renderJson(result);
 	}
 	
-	
 	@Before(Tx.class)
 	public void upload() {
 		Map<String, Object> result = getResultMap();
@@ -266,8 +324,10 @@ public class FilterController extends BaseController {
 			sysFile.set("o_name", fileName).set("n_name", newFileName).set("l_path", upload.getFile().getParentFile().getAbsolutePath()+"/"+newFileName).set("size", upload.getFile().length())
 				.set("u_time", new java.sql.Date(System.currentTimeMillis())).set("type",1).save();
 			Integer brand = getParaToInt("brand");
-			Integer tid = getParaToInt("tid");
-			FilterPicModel model = FilterPicModel.dao.getByBidTid(brand,tid);
+			Integer type = getParaToInt("type");
+			Integer mm = getParaToInt("model");
+			Integer eid = getParaToInt("eid");
+			OilPicModel model = OilPicModel.dao.getByBidType(brand, type,mm,eid);
 			if(null!=model){
 				//删除旧图片  更新model
 				Integer pid = model.getInt("p_id");
@@ -279,9 +339,9 @@ public class FilterController extends BaseController {
 					}	
 					fileModel.delete();
 				}
-				model.set("b_id", brand).set("t_id", tid).set("p_id", sysFile.getInt("id")).update();
+				model.set("b_id", brand).set("type", type).set("p_id", sysFile.getInt("id")).set("m_id", mm).set("e_id", eid).update();
 			}else{
-				new FilterPicModel().set("b_id", brand).set("t_id", tid).set("p_id", sysFile.getInt("id")).save();
+				new OilPicModel().set("b_id", brand).set("type", type).set("p_id", sysFile.getInt("id")).set("m_id", mm).set("e_id", eid).save();
 			}
 			result.put("fID", sysFile.getInt("id"));
 			result.put(RESULT, true);
@@ -297,7 +357,9 @@ public class FilterController extends BaseController {
 	public void download(){
 		Integer brand = getParaToInt("brand");
 		Integer type = getParaToInt("type");
-		FilterPicModel model = FilterPicModel.dao.getByBidTid(brand, type);
+		Integer mm = getParaToInt("model");
+		Integer eid = getParaToInt("eid");
+		OilPicModel model = OilPicModel.dao.getByBidType(brand, type,mm,eid);
 		if(null!=model){
 			Integer fid = model.getInt("p_id");
 			FileModel sf = FileModel.dao.findById(fid);
@@ -307,11 +369,36 @@ public class FilterController extends BaseController {
 		}
 	}
 	
+	public void getAllModel(){
+		renderJson(OilModelModel.dao.getAllByBid(getParaToInt("bid")));
+	}
+	
+	public void getAllEtalon(){
+		Integer bid = getParaToInt("bid");
+		Integer mid = getParaToInt("mid");
+		List<OilEtalonModel> list = OilEtalonModel.dao.getMOdelByBidMid(bid, mid);
+		renderJson(list);
+	}
+	
 	
 	public static void main(String[] args) throws Exception {
-		String str = "%E4%B8%8A%E4%BC%A0%E7%BB%93%E6%9E%9C_14338440626701421417820739167.txt";
+		/*String str = "%E4%B8%8A%E4%BC%A0%E7%BB%93%E6%9E%9C_14338440626701421417820739167.txt";
 		String decode = URLDecoder.decode(str, "UTF-8");
-		System.out.println(decode);
+		System.out.println(decode);*/
+		/*
+		for (int i = 0; i < 5; i++) {
+			switch(i){
+			case 1:System.out.println(i);
+			case 2:System.out.println(i);continue;
+			case 3:System.out.println(i);continue;
+			case 4:System.out.println(i);continue;
+			}
+		}*/
+		
+		String s = "3.5-4.0(4JB1TC)";
+		System.out.println(s.substring(s.indexOf("-")+1));
+		s = "4.0(4JB1TC)";
+		System.out.println(s.substring(0, s.indexOf("(")));
 		
 	}
 	

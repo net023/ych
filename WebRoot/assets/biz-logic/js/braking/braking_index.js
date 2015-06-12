@@ -1,4 +1,8 @@
 $(function() {
+	var grid = $('#grid')._datagrid({
+		checkOnSelect:false,
+        selectOnCheck:false
+	});
 	
 	$('#queryButton').click(function(){
         var params = $('#queryForm')._formToJson();
@@ -20,12 +24,6 @@ $(function() {
 		}
 	});
 	
-	var grid = $('#grid')._datagrid({
-		checkOnSelect:false,
-        selectOnCheck:false
-	});
-	
-	
 	$('#priceDialog').dialog({
 		buttons:[{text:'保存',handler:function(){
 			if(!$('#priceForm').form('validate')){return;}
@@ -38,6 +36,40 @@ $(function() {
 			});
 			
 		}},{text:'关闭',handler:function(){$('#priceDialog').dialog('close');}}]
+	});
+	
+	$("#xzslb").click(function(){
+		var fileName = encodeURIComponent(encodeURIComponent("制动系价格表--模版.xlsx"));
+		window.open("file/df?fn="+fileName);
+	});
+	
+	var ii;
+	$("#scslb").fileupload({
+		url:'braking/batchEdit',
+		dataType: 'json',
+		done:function(e,result){
+			layer.close(ii);
+			if(result.result.r){
+				$("#grid").datagrid('reload');
+				var fileName = encodeURIComponent(encodeURIComponent(result.result.f));
+				asyncbox.open({
+					title:result.result.m,
+					html:'<a href="#" onclick="javascript:(window.open(\'file/df2?fn='+fileName+'\'))">点击下载上传结果信息</a>',
+					width : 200,
+					height : 200
+				});
+			}else{
+				$.messager.alert("上传失败",result.result.m);
+			}
+		},
+		fail:function(){
+			layer.close(ii);
+			$.messager.alert("错误提示","系统异常请联系管理员。");
+		},
+		add: function (e, data) {
+		   ii = layer.load();
+		   data.submit();
+        }
 	});
 	
     

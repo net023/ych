@@ -43,6 +43,26 @@
 						        style="width: 155px;">
                 		</span>
                 		<span class="spacing">
+                			<label>状态：</label>
+	                		<input id="status" name="status" class="easyui-combobox" data-options="
+								editable:false,
+								required:false,
+						        valueField:'id',
+						        textField:'name',
+						        data:[{id:'',name:'全部'},{id:0,name:'已启用'},{id:1,name:'已禁用'}]"
+						        style="width: 155px;">
+                		</span>
+                		<span class="spacing">
+                			<label>推荐：</label>
+	                		<input id="recmd" name="recmd" class="easyui-combobox" data-options="
+								editable:false,
+								required:false,
+						        valueField:'id',
+						        textField:'name',
+						        data:[{id:'',name:'全部'},{id:0,name:'推荐'},{id:1,name:'不推荐'}]"
+						        style="width: 155px;">
+                		</span>
+                		<span class="spacing">
                 			<label>编号：</label>
                 			<input type="text" name="snumber" >
                 		</span>
@@ -52,6 +72,23 @@
                 		</span>
 		                <span class="spacing">
 		                	<input type="submit" id="queryButton" value="查询"/>
+		                </span>
+		                <span class="spacing">
+		              		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		                	<input type="button" id="upPic" value="上传图片">
+		                </span>
+		                <span class="spacing">
+		              		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		                	<input type="button" id="lookPic" value="查看图片">
+		                </span>
+		                 <span>
+		               		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		                	<input type="button" id="xzslb" value="下载模版">
+		                </span>
+		                <span>
+		                	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		             	    <label>导入excel价格表批量修改：</label>
+		                	<input type="file" id="scslb" name="scslb">
 		                </span>
                 </form>
                 <!-- <span>
@@ -87,6 +124,40 @@
 	    		</div>
     		</form>
     	</div>
+    	
+    	<div id="picDialog" style="width: 600px;height: 400px;padding-left: 30px;" data-options="resizable:false,modal:true,closed: true">
+    			<span>
+	    			<label>品牌</label>
+	    			<input id="pinpai" class="easyui-combobox" data-options="
+									editable:false,
+									required:true,
+							        valueField:'id',
+							        textField:'name',
+							        data:${pinpai}"
+							        style="width: 155px;">
+    			</span>
+    			<span>
+					<label>选择上传图片</label>
+	    			<input id="upFile" name="upFile" type="file">
+    			</span>
+    			<div id="upf"></div>
+    	</div>
+    	
+    	<div id="lookDialog" style="width: 600px;height: 400px;padding-left: 30px;" data-options="resizable:false,modal:true,closed: true">
+    			<span>
+	    			<label>品牌</label>
+	    			<input id="lpinpai" class="easyui-combobox" data-options="
+									editable:false,
+									required:true,
+							        valueField:'id',
+							        textField:'name',
+							        data:${pinpai}"
+							        style="width: 155px;">
+    			</span>
+				<h5>图片</h5>
+				<div id="tp"></div>
+    	</div>
+    	
     </div>
     
 </body>

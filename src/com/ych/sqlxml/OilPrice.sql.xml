@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sqlGroup namespace="OilPrice">
+	
+	<!-- 动态SQL处理 -->
+	<sql id="pager">
+		<![CDATA[
+			from(
+				select t1.id,t1.`type`,t1.price,t1.`status`,t1.recmd,t2.name 'etalon',t3.name 'brand',t4.name 'model' from (
+					select * from oil_price where 1=1
+					<% if(!isEmpty(type)){ %>
+					 AND `type` = #$type$#
+					<% } %>
+					<% if(!isEmpty(etalon)){ %>
+					 AND e_id = #$etalon$#
+					<% } %>
+					<% if(!isEmpty(brand)){ %>
+					 AND b_id = #$brand$#
+					<% } %>
+					<% if(!isEmpty(model)){ %>
+					 AND m_id = #$model$#
+					<% } %>
+					<% if(!isEmpty(status)){ %>
+					 AND `status` = #$status$#
+					<% } %>
+					<% if(!isEmpty(recmd)){ %>
+					 AND `recmd` = #$recmd$#
+					<% } %>
+				)t1
+				LEFT JOIN oil_etalon t2 on t2.id = t1.e_id
+				LEFT JOIN oil_brand t3 ON t3.id = t1.b_id
+				LEFT JOIN oil_model t4 ON t4.id = t1.m_id
+			)t 
+		]]>
+	</sql>
+	
+	
+</sqlGroup>

@@ -1,26 +1,37 @@
 package com.ych.web.controller;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import com.jfinal.aop.Before;
+import com.jfinal.kit.FileKit;
+import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.StrKit;
 import com.jfinal.log.Logger;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.tx.Tx;
 import com.jfinal.render.JsonRender;
+import com.jfinal.upload.UploadFile;
 import com.ych.base.common.BaseController;
 import com.ych.base.common.Pager;
 import com.ych.core.plugin.annotation.Control;
+import com.ych.tools.DateTools;
 import com.ych.tools.ModelTools;
 import com.ych.tools.SysConstants;
 import com.ych.tools.excel.XxlsPrint;
+import com.ych.web.model.FileModel;
 import com.ych.web.model.SparkBrandModel;
 import com.ych.web.model.SparkModel;
 import com.ych.web.model.SparkModelModel;
+import com.ych.web.model.SparkPicModel;
 import com.ych.web.model.SparkSeriesModel;
 
 @Control(controllerKey = "/spark")
@@ -31,6 +42,7 @@ public class SparkController extends BaseController {
 		try {
 			String df = "[{'id':'','name':'全部'}]";
 			setAttr("brands", ModelTools.putFirstDataRender("id", "name", "", "全部", SparkBrandModel.dao.getAll()));
+			setAttr("pinpai", JsonKit.toJson(SparkBrandModel.dao.getAll()).replace("\"", "'"));
 			setAttr("series", df);
 			setAttr("models", df);
 		} catch (Exception e) {
@@ -52,6 +64,8 @@ public class SparkController extends BaseController {
 		pager.addParam("brand", getParaToInt("brand"));
 		pager.addParam("series", getParaToInt("series"));
 		pager.addParam("model", getParaToInt("model"));
+		pager.addParam("status", getParaToInt("status"));
+		pager.addParam("recmd", getParaToInt("recmd"));
 		if(StrKit.notBlank(getPara("snumber"))){
 			pager.addParam("snumber", getPara("snumber").trim());
 		}
@@ -64,6 +78,7 @@ public class SparkController extends BaseController {
 		renderJson();
 	}
 	
+	@Before(Tx.class)
 	public void batchup(){
 		Map<String, Object> result = getResultMap();
 		try {
@@ -252,6 +267,58 @@ public class SparkController extends BaseController {
 		}
 	}
 	
+	
+	@Before(Tx.class)
+	public void batchEdit(){
+		Map<String, Object> result = getResultMap();
+		OutputStreamWriter ow = null;
+		BufferedWriter bw = null;
+		try {
+			File excelFile = getFile("scslb", SysConstants.IMG_DIR, SysConstants.MAX_POST_SIZE).getFile();
+			
+			String absolutePath = excelFile.getAbsolutePath();
+			XxlsPrint howto = new XxlsPrint();
+			howto.processOneSheet(absolutePath, 1);
+			List<List> data = howto.getMsg();
+			List<String> row = null;
+			File tempFile = File.createTempFile("上传结果_"+System.currentTimeMillis()/1000, ".txt", new File(SysConstants.IMG_DIR));
+			ow = new OutputStreamWriter(new FileOutputStream(tempFile), "UTF-8");
+			bw = new BufferedWriter(ow);
+			for (int i = 1; i < data.size(); i++) {
+				row = data.get(i);
+				String productNum = row.get(0);
+				String priceStr = row.get(1);
+				if(StrKit.notBlank(productNum,priceStr)){
+					BigDecimal price = new BigDecimal(priceStr);
+					boolean isUP = SparkModel.dao.updatePriceByName(price, productNum);
+					if(!isUP){
+						bw.write(productNum+"	数据库中不存在");
+						bw.newLine();
+					}
+				}
+			}
+			
+			result.put(RESULT, true);
+			result.put("f", tempFile.getName());
+			result.put(MESSAGE, "上传成功！");
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOG.debug("文件上传失败！" + e.getMessage());
+			result.put(RESULT, false);
+			result.put(MESSAGE, "上传失败！");
+		}finally{
+			try {
+				if(null!=bw){
+					bw.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		render(new JsonRender(result).forIE());
+	}
+	
+	
 	@Before(Tx.class)
 	public void modify(){
 		Integer id = getParaToInt("id");
@@ -294,6 +361,59 @@ public class SparkController extends BaseController {
 			result.put(MESSAGE, "价格更新失败！");
 		}
 		renderJson(result);
+	}
+	
+	
+	@Before(Tx.class)
+	public void upload() {
+		Map<String, Object> result = getResultMap();
+		try {
+			UploadFile upload = getFile("upFile", SysConstants.IMG_DIR, SysConstants.MAX_POST_SIZE);
+			String fileName = upload.getOriginalFileName();
+			String newFileName = DateTools.format(new Date(), DateTools.yyyyMMddHHmmssSSS) + fileName.substring(fileName.lastIndexOf("."), fileName.length());
+			//修改上传文件的文件名称
+			upload.getFile().renameTo(new File(SysConstants.IMG_DIR + File.separator + newFileName));
+			FileModel sysFile = new FileModel();
+			sysFile.set("o_name", fileName).set("n_name", newFileName).set("l_path", upload.getFile().getParentFile().getAbsolutePath()+"/"+newFileName).set("size", upload.getFile().length())
+				.set("u_time", new java.sql.Date(System.currentTimeMillis())).set("type",1).save();
+			Integer brand = getParaToInt("brand");
+			SparkPicModel model = SparkPicModel.dao.getByBidType(brand);
+			if(null!=model){
+				//删除旧图片  更新model
+				Integer pid = model.getInt("p_id");
+				FileModel fileModel = FileModel.dao.findById(pid);
+				if(null!=fileModel){
+					String localPath = fileModel.getStr("l_path");
+					if(StrKit.notBlank(localPath)){
+						FileKit.delete(new File(localPath));
+					}	
+					fileModel.delete();
+				}
+				model.set("b_id", brand).set("p_id", sysFile.getInt("id")).update();
+			}else{
+				new SparkPicModel().set("b_id", brand).set("p_id", sysFile.getInt("id")).save();
+			}
+			result.put("fID", sysFile.getInt("id"));
+			result.put(RESULT, true);
+			result.put(MESSAGE, "上传成功！");
+		} catch (Exception e) {
+			LOG.debug("文件上传失败！" + e.getMessage());
+			result.put(RESULT, false);
+			result.put(MESSAGE, "上传失败！");
+		}
+		render(new JsonRender(result).forIE());
+	}
+	
+	public void download(){
+		Integer brand = getParaToInt("brand");
+		SparkPicModel model = SparkPicModel.dao.getByBidType(brand);
+		if(null!=model){
+			Integer fid = model.getInt("p_id");
+			FileModel sf = FileModel.dao.findById(fid);
+			renderFile(new File(sf.getStr("l_path")));
+		}else{
+			renderNull();
+		}
 	}
 	
 	
