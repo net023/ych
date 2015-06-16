@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sqlGroup namespace="Order">
+	
+	<!-- 动态SQL处理 -->
+	<sql id="pager">
+		<![CDATA[ 
+			FROM ( 
+				select t1.id,t1.res_time,t1.`status`,t2.phone,t2.name,t3.price,t3.fs,t4.`name` ms,t5.name 'store' from (
+					select id,b_id,`status`,res_time,wx_id,ms_id from `order` where 1=1
+					<% if(!isEmpty(startDate)){ %>
+						AND res_time>=#'$startDate$'#
+					<% } %>
+					<% if(!isEmpty(endDate)){ %>
+					 AND res_time<DATE_ADD(#'$endDate$'#,INTERVAL 1 DAY)
+					<% } %>
+					<% if(!isEmpty(store)){ %>
+					 AND b_id=#$store$#
+					<% } %>
+					<% if(!isEmpty(status)){ %>
+					 AND `status`=#$status$#
+					<% } %>
+					<% if(!isEmpty(orderNum)){ %>
+					 AND id=#$orderNum$#
+					<% } %>
+				)t1
+				left join(
+					select `name`,id,phone from wxuser where 1=1
+					<% if(!isEmpty(wxNickName)){ %>
+					 AND `name`=#$wxNickName$#
+					<% } %>
+				)t2 on t2.id = t1.wx_id
+				left join(
+					select o_id,sum(pp) price,group_concat(fs) fs from (
+						select t1.o_id,
+							case t1.type WHEN 1 THEN t2.price*t1.n ELSE t3.price*t1.n END AS 'pp',
+							case t1.type WHEN 1 THEN t4.p_id ELSE t5.p_id END AS 'fs'
+						from (
+							select o_id,c_id,sum(num) n,type from order_commodity group by o_id,c_id,type
+						)t1
+						LEFT JOIN filter_price t2 ON t2.id = t1.c_id
+						LEFT JOIN oil_price t3 ON t3.id = t1.c_id
+						LEFT JOIN filter_pic t4 ON t4.b_id = t2.b_id and t4.t_id = t2.t_id
+						LEFT JOIN oil_pic t5 ON t5.b_id = t3.b_id and t5.e_id=t3.e_id and t5.m_id = t3.m_id
+					)tt group by o_id
+				)t3 on t3.o_id = t1.id
+				left join mtser t4 on t4.id = t1.ms_id
+				left join store t5 on t5.id = t1.b_id
+			)t
+		]]>
+	</sql>
+	
+	<sql id="pager_old">
+		<![CDATA[ 
+			FROM ( 
+				select t1.id,t1.res_time,t1.`status`,t2.phone,t2.name,t3.price,t3.fs,t4.ms,t5.name 'store' from (
+					select id,b_id,`status`,res_time,wx_id from `order` where 1=1
+					<% if(!isEmpty(startDate)){ %>
+						AND res_time>=#'$startDate$'#
+					<% } %>
+					<% if(!isEmpty(endDate)){ %>
+					 AND res_time<DATE_ADD(#'$endDate$'#,INTERVAL 1 DAY)
+					<% } %>
+					<% if(!isEmpty(store)){ %>
+					 AND b_id=#$store$#
+					<% } %>
+					<% if(!isEmpty(status)){ %>
+					 AND `status`=#$status$#
+					<% } %>
+					<% if(!isEmpty(orderNum)){ %>
+					 AND id=#$orderNum$#
+					<% } %>
+				)t1
+				left join(
+					select `name`,id,phone from wxuser where 1=1
+					<% if(!isEmpty(wxNickName)){ %>
+					 AND `name`=#$wxNickName$#
+					<% } %>
+				)t2 on t2.id = t1.wx_id
+				left join(
+					select o_id,sum(pp) price,group_concat(fs) fs from (
+						select t1.o_id,
+							case t1.type WHEN 1 THEN t2.price*t1.n ELSE t3.price*t1.n END AS 'pp',
+							case t1.type WHEN 1 THEN t4.p_id ELSE t5.p_id END AS 'fs'
+						from (
+							select o_id,c_id,sum(num) n,type from order_commodity group by o_id,c_id,type
+						)t1
+						LEFT JOIN filter_price t2 ON t2.id = t1.c_id
+						LEFT JOIN oil_price t3 ON t3.id = t1.c_id
+						LEFT JOIN filter_pic t4 ON t4.b_id = t2.b_id and t4.t_id = t2.t_id
+						LEFT JOIN oil_pic t5 ON t5.b_id = t3.b_id and t5.e_id=t3.e_id and t5.m_id = t3.m_id
+					)tt group by o_id
+				)t3 on t3.o_id = t1.id
+				left join(
+					select o_id,group_concat(`name`) ms from (
+						select t1.o_id,t1.ms_id,t2.`name` from order_mtser t1
+						left join mtser t2 on t2.id = t1.ms_id
+					)t group by o_id
+				)t4 on t4.o_id = t1.id
+				left join store t5 on t5.id = t1.b_id
+			)t
+		]]>
+	</sql>
+	
+</sqlGroup>

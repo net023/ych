@@ -133,8 +133,8 @@ public class FilterController extends BaseController {
 	@Before(Tx.class)
 	public void batchEdit(){
 		Map<String, Object> result = getResultMap();
-		OutputStreamWriter ow = null;
-		BufferedWriter bw = null;
+//		OutputStreamWriter ow = null;
+//		BufferedWriter bw = null;
 		try {
 			File excelFile = getFile("upFile1", SysConstants.IMG_DIR, SysConstants.MAX_POST_SIZE).getFile();
 			Integer brand = getParaToInt("brand");
@@ -145,9 +145,9 @@ public class FilterController extends BaseController {
 			howto.processOneSheet(absolutePath, 1);
 			List<List> data = howto.getMsg();
 			List<String> row = null;
-			File tempFile = File.createTempFile("上传结果_"+System.currentTimeMillis()/1000, ".txt", new File(SysConstants.IMG_DIR));
-			ow = new OutputStreamWriter(new FileOutputStream(tempFile), "UTF-8");
-			bw = new BufferedWriter(ow);
+//			File tempFile = File.createTempFile("上传结果_"+System.currentTimeMillis()/1000, ".txt", new File(SysConstants.IMG_DIR));
+//			ow = new OutputStreamWriter(new FileOutputStream(tempFile), "UTF-8");
+//			bw = new BufferedWriter(ow);
 			for (int i = 1; i < data.size(); i++) {
 				row = data.get(i);
 				String productNum = row.get(0);
@@ -169,17 +169,18 @@ public class FilterController extends BaseController {
 				}
 			}
 			
-			bw.write("恭喜你上传成功了!!");
+//			bw.write("恭喜你上传成功了!!");
 			
 			result.put(RESULT, true);
-			result.put("f", tempFile.getName());
+//			result.put("f", tempFile.getName());
 			result.put(MESSAGE, "上传成功！");
 		} catch (Exception e) {
 			e.printStackTrace();
 			LOG.debug("文件上传失败！" + e.getMessage());
 			result.put(RESULT, false);
 			result.put(MESSAGE, "上传失败！");
-		}finally{
+		}
+		/*finally{
 			try {
 				if(null!=bw){
 					bw.close();
@@ -187,7 +188,7 @@ public class FilterController extends BaseController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
+		}*/
 		render(new JsonRender(result).forIE());
 	}
 	

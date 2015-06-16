@@ -1,4 +1,5 @@
 var files = new Array();
+var point = null;
 /** 
 *删除数组指定下标或指定对象 
 */ 
@@ -91,6 +92,8 @@ $(function() {
 		
 		
 	$("#mapDialog").dialog({
+	});
+	$("#mapDialog2").dialog({
 		buttons:[{text:"关闭",handler:function(){$("#mapDialog").dialog("close");}}]
 	});
 	
@@ -98,56 +101,120 @@ $(function() {
 		$('#mapDialog').dialog('open').dialog("setTitle","在地图上选择地点");
 		
 		var mk;
-		var map = new BMap.Map("mapDialog");
-		map.centerAndZoom("重庆",14);
-		var geolocation = new BMap.Geolocation();
-		var geoc = new BMap.Geocoder()
-		geolocation.getCurrentPosition(function(r){
-			if(this.getStatus() == BMAP_STATUS_SUCCESS){
-				mk = new BMap.Marker(r.point);
-				map.addOverlay(mk);
-				map.panTo(r.point);
-				window.sjcj.point = r.point;
-				geoc.getLocation(r.point, function(rs){
-					window.sjcj.address = rs.address;
-					window.sjcj.rs = rs.addressComponents;
-					mapHandler();
-				}); 
-			}
-			else {
-				alert('failed'+this.getStatus());
-			}        
-		},{enableHighAccuracy: true})
-		//回到默认地方
-			map.addControl(new BMap.GeolocationControl());
-			//显示三种地图类型切换
-			map.addControl(new BMap.MapTypeControl()); 
-			//小地图
-			map.addControl(new BMap.OverviewMapControl());
-			//导航标尺
-			var opts = {anchor:BMAP_ANCHOR_TOP_LEFT};
-			map.addControl(new BMap.NavigationControl(opts));
-			
-			map.addEventListener("click",function(e){
-				window.sjcj.point = e.point;
-				map.removeOverlay(mk);
-				//mk.dispose();
-				mk = new BMap.Marker(e.point);
-				map.addOverlay(mk);
-				map.panTo(e.point);
-				geoc.getLocation(e.point, function(rs){
-					window.sjcj.address = rs.address;
-					window.sjcj.rs = rs.addressComponents;
-					alert(rs.address);
-					mapHandler();
-				});   
-			});
+		var map = new BMap.Map("l-map");
 		
-		window.setTimeout(function(){
+		//回到默认地方
+		map.addControl(new BMap.GeolocationControl());
+		//显示三种地图类型切换
+		map.addControl(new BMap.MapTypeControl()); 
+		//小地图
+		map.addControl(new BMap.OverviewMapControl());
+		//导航标尺
+		var opts = {anchor:BMAP_ANCHOR_TOP_LEFT};
+		map.addControl(new BMap.NavigationControl(opts));
+		
+		map.enableScrollWheelZoom();   //启用滚轮放大缩小，默认禁用
+		map.enableContinuousZoom();    //启用地图惯性拖拽，默认禁用
+		
+		var geoc = new BMap.Geocoder()
+		map.addEventListener("click",function(e){
+			window.sjcj.point = e.point;
+			map.removeOverlay(mk);
+			//mk.dispose();
+			mk = new BMap.Marker(e.point);
+			map.addOverlay(mk);
+			map.panTo(e.point);
+			geoc.getLocation(e.point, function(rs){
+				window.sjcj.address = rs.address;
+				window.sjcj.rs = rs.addressComponents;
+				alert(rs.address);
+				mapHandler();
+			});   
+		});
+		
+		if(point){
+			var p = new BMap.Point(point.lon,point.lat);
+			map.centerAndZoom(p,19);
+			mk = new BMap.Marker(p);
+			map.addOverlay(mk);
+			map.panTo(p);
+			window.sjcj.point = p;
+		}else{
+			map.centerAndZoom("重庆",15);
+			var geolocation = new BMap.Geolocation();
+			
+			geolocation.getCurrentPosition(function(r){
+				if(this.getStatus() == BMAP_STATUS_SUCCESS){
+					mk = new BMap.Marker(r.point);
+					map.addOverlay(mk);
+					map.panTo(r.point);
+					window.sjcj.point = r.point;
+					geoc.getLocation(r.point, function(rs){
+						window.sjcj.address = rs.address;
+						window.sjcj.rs = rs.addressComponents;
+						mapHandler();
+					}); 
+				}
+				else {
+					alert('failed'+this.getStatus());
+				}        
+			},{enableHighAccuracy: true})
+		}
+		
+		/*window.setTimeout(function(){
 			//隐藏百度地图logo
 			$("#mapDialog > div").eq(-2).hide();
-		},1000);
+		},1000);*/
+		
+		//百度地图搜索--------------------------
+		var ac = new BMap.Autocomplete(    //建立一个自动完成的对象
+				{"input" : "suggestId"
+				,"location" : map
+			});
+
+			ac.addEventListener("onhighlight", function(e) {  //鼠标放在下拉列表上的事件
+			var str = "";
+				var _value = e.fromitem.value;
+				var value = "";
+				if (e.fromitem.index > -1) {
+					value = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+				}    
+				str = "FromItem<br />index = " + e.fromitem.index + "<br />value = " + value;
+				
+				value = "";
+				if (e.toitem.index > -1) {
+					_value = e.toitem.value;
+					value = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+				}    
+				str += "<br />ToItem<br />index = " + e.toitem.index + "<br />value = " + value;
+				G("searchResultPanel").innerHTML = str;
+			});
+
+			var myValue;
+			ac.addEventListener("onconfirm", function(e) {    //鼠标点击下拉列表后的事件
+			var _value = e.item.value;
+				myValue = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+				G("searchResultPanel").innerHTML ="onconfirm<br />index = " + e.item.index + "<br />myValue = " + myValue;
+				
+				setPlace(map,myValue);
+			});
 	});
+	function setPlace(map,myValue){
+		map.clearOverlays();    //清除地图上所有覆盖物
+		function myFun(){
+			var pp = local.getResults().getPoi(0).point;    //获取第一个智能搜索的结果
+			map.centerAndZoom(pp, 18);
+			map.addOverlay(new BMap.Marker(pp));    //添加标注
+		}
+		var local = new BMap.LocalSearch(map, { //智能搜索
+			onSearchComplete: myFun
+		});
+		local.search(myValue);
+	}
+	// 百度地图API功能
+	function G(id) {
+		return document.getElementById(id);
+	}
 	
 	$("#storePic").fileupload({
 		 url:'file/upload',
@@ -179,7 +246,7 @@ $(function() {
                 }else{$.messager.alert('操作提示', r.m,'error');}
             });
            
-        }},{text:'关闭',handler:function(){$('#editDialog').dialog('close');}}]
+        }},{text:'关闭',handler:function(){$('#editDialog').dialog('close');point = null;}}]
     });
 	
 	$('#backUserDialog').dialog({
@@ -260,6 +327,63 @@ $(function() {
         }
     }
     
+    $("#lookAllPoint").click(function(){
+    	$._ajaxPost('store/getAll',{},function(r){
+            if(r){
+            	$('#mapDialog2').dialog('open').dialog("setTitle","查看");
+        		
+        		var mk;
+        		var map = new BMap.Map("mapDialog2");
+        		
+        		//回到默认地方
+        		map.addControl(new BMap.GeolocationControl());
+        		//显示三种地图类型切换
+        		map.addControl(new BMap.MapTypeControl()); 
+        		//小地图
+        		map.addControl(new BMap.OverviewMapControl());
+        		//导航标尺
+        		var opts = {anchor:BMAP_ANCHOR_TOP_LEFT};
+        		map.addControl(new BMap.NavigationControl(opts));
+        		
+        		map.enableScrollWheelZoom();   //启用滚轮放大缩小，默认禁用
+        		map.enableContinuousZoom();    //启用地图惯性拖拽，默认禁用.
+        		
+        		map.centerAndZoom('重庆', 13);
+        		
+        		for(var i in r){
+        			var lon = r[i].lon;
+        			var lat = r[i].lat;
+        			var point = new BMap.Point(lon, lat);  
+        			mk = new BMap.Marker(point); 
+        			map.addOverlay(mk);
+        			addClickHandler(r[i].name+"<br/>"+"地址:"+r[i].ads,mk,map);
+        		}
+            }else{
+            	$.messager.alert('查看失败');
+            }
+        });
+    });
+    
+    var opts = {
+			width : 200,     // 信息窗口宽度
+			height: 30,     // 信息窗口高度
+//			title : "门店信息" , // 信息窗口标题
+			enableMessage:true//设置允许信息窗发送短息
+		   };
+    
+    function addClickHandler(content,marker,map){
+		marker.addEventListener("click",function(e){
+			openInfo(content,e,map)}
+		);
+	}
+	function openInfo(content,e,map){
+		var p = e.target;
+		var point = new BMap.Point(p.getPosition().lng, p.getPosition().lat);
+		var infoWindow = new BMap.InfoWindow(content,opts);  // 创建信息窗口对象 
+		map.openInfoWindow(infoWindow,point); //开启信息窗口
+	}
+    
+    
 });
 var formatter = {
     opt : function(value, rowData, rowIndex) {
@@ -306,12 +430,13 @@ function modify(i,s){
 	});
 }
 
-
 /*修改版本*/
 function updVersion(rowIndex) {
     $('#editForm').attr('action','store/update').resetForm();
     var data = $('#grid').datagrid('getRows')[rowIndex];
     $('#editForm')._jsonToForm(data);
+    point = {};
+    point.lat = data.lat;point.lon=data.lon;
     $('#editDialog').dialog('open').dialog('setTitle','修改门店');
     $("#picNode").empty();
     $('input:checkbox').each(function () {

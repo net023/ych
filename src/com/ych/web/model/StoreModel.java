@@ -2,6 +2,7 @@ package com.ych.web.model;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Model;
@@ -38,5 +39,16 @@ public class StoreModel extends Model<StoreModel> {
 	public boolean modify(Integer id,Integer status){
 		return Db.update("update store set status = ? where id = ?",status,id)==1;
 	}
+	
+	public List<StoreModel> getAll(){
+		String sql = "select id,`name` from store where status =0";
+		return this.find(sql);
+	}
+	
+	public List<StoreModel> getAll2(){
+		String sql = "select id,`name`,lon,lat,concat(city,county,address) 'ads' from store where status =0";
+		return this.find(sql);
+	}
+	
 	
 }

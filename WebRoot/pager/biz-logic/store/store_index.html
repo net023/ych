@@ -18,6 +18,7 @@
                 			<input type="text" name="storeName">
                 		</span>
                     <span class="spacing"><input type="submit" id="queryButton" value="查询"/></span>
+                    <span class="spacing"><input type="submit" id="lookAllPoint" value="查看地图"/></span>
                 </form>
             </div>
         </div>
@@ -27,6 +28,8 @@
             	<th data-options="field:'id',hidden:true">ID</th>
                 <th data-options="field:'name',width:80,resizable:true,align:'left'">门店名称</th>
                 <th data-options="field:'username',width:80,resizable:true,align:'left'">门店登录用户名</th>
+                <th data-options="field:'contact',width:80,resizable:true,align:'left'">联系人</th>
+                <th data-options="field:'phone',width:80,resizable:true,align:'left'">电话</th>
             	<th data-options="field:'address',hidden:true">address</th>
             	<th data-options="field:'info',hidden:true">info</th>
             	<th data-options="field:'lon',hidden:true">lon</th>
@@ -46,7 +49,16 @@
     </div>
     
     <div class="hide-panel">
-    	<div id="mapDialog" style="width:600px;height:500px;padding-left: 30px;" data-options="resizable:false,modal:true,closed:true">
+    	<div id="mapDialog" style="width:800px;height:600px;padding-left: 30px;" data-options="resizable:false,modal:false,closed:true">
+    		<div id="l-map" style="width: 700px;height: 542px;"></div>
+	    	<div id="r-result">请输入:<input type="text" id="suggestId" size="20" value="百度" style="width:400px;" /></div>
+			<div id="searchResultPanel" style="border:1px solid #C0C0C0;width:400px;height:auto; display:none;z-index: 888"></div>
+    	</div>
+    </div>
+    
+    
+    <div class="hide-panel">
+    	<div id="mapDialog2" style="width:1000px;height:750px;padding-left: 30px;" data-options="resizable:false,modal:true,closed:true">
     	</div>
     </div>
     
@@ -67,7 +79,7 @@
     </div>
     
     <div class="hide-panel">
-        <div id="editDialog" style="width:800px;height:600px;padding-left:30px;" data-options="resizable:false,modal:true,closed: true">
+        <div id="editDialog" style="width:800px;height:600px;padding-left:30px;" data-options="resizable:false,modal:false,closed: true">
             <form id="editForm" class="form_style" method="post" onsubmit="return false;">
                 <input type="hidden" name="id" id="id" />
                 <input type="hidden" name="fs" id="fs"/>
@@ -134,6 +146,14 @@
                     <%for(mtSer in allMtSers) {%>
                     	<input type="checkbox" name="ms" value="${mtSer.id}" id="ms_${mtSer.id}">${mtSer.name}
                    	<%}%>
+                </div>
+                <div class="form-field">
+                    <label>联系人：<font color="red">*</font></label>
+                    <input type="text" name="contact">
+                </div>
+                <div class="form-field">
+                    <label>电话：<font color="red">*</font></label>
+                    <input type="text" name="phone">
                 </div>
                 <div class="form-field">
                     <label>资质：<font color="red">*</font></label>

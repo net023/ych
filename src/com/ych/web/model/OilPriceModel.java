@@ -33,4 +33,8 @@ public class OilPriceModel extends Model<OilPriceModel> {
 		return Db.update("update oil_price set recmd = ? where id = ?", status, id) == 1;
 	}
 	
+	public OilPriceModel getModelByBMETL(Integer brand,Integer model,Integer etalon,Integer type,Integer litre){
+		return this.findFirst("select * from oil_price where b_id=? and m_id=? and e_id=? and type=? and litre=?", brand,model,etalon,type,litre);
+	}
+	
 }

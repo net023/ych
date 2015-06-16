@@ -66,7 +66,7 @@ public class SystemConfig extends JFinalConfig {
 		me.add(druidPlugin);
 		
 		// 配置定时器
-		me.add(new QuartzPlugin());
+//		me.add(new QuartzPlugin());
 
 		// 加载sqlxml
 		me.add(new SqlXmlPlugin());

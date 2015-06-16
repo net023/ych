@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.EncryptionKit;
 import com.jfinal.kit.FileKit;
@@ -17,6 +18,7 @@ import com.jfinal.plugin.activerecord.tx.Tx;
 import com.ych.base.common.BaseController;
 import com.ych.base.common.Pager;
 import com.ych.core.plugin.annotation.Control;
+import com.ych.tools.BaiDuLBSTool;
 import com.ych.tools.SysConstants;
 import com.ych.web.model.FileModel;
 import com.ych.web.model.MtSerModel;
@@ -71,20 +73,28 @@ public class StoreController extends BaseController {
 			store.set("c_time", new Date()).save();
 			// 图片文件id
 			String fsStr = getPara("fs");
-			String[] fs = fsStr.split("\\|");
-			for (String fid : fs) {
-				StorePicModel storePic = new StorePicModel();
-				storePic.set("s_id", store.getInt("id"))
-						.set("f_id", Integer.valueOf(fid)).save();
+			if(StrKit.notBlank(fsStr)){
+				String[] fs = fsStr.split("\\|");
+				for (String fid : fs) {
+					StorePicModel storePic = new StorePicModel();
+					storePic.set("s_id", store.getInt("id"))
+					.set("f_id", Integer.valueOf(fid)).save();
+				}
 			}
 			Map<String, String[]> paraMap = getParaMap();
 			// 服务类型
 			String[] ms = paraMap.get("ms");
-			for (String mid : ms) {
-				StoreMtserModel storeMtser = new StoreMtserModel();
-				storeMtser.set("s_id", store.getInt("id"))
-						.set("ms_id", Integer.valueOf(mid)).save();
+			if(null!=ms){
+				for (String mid : ms) {
+					StoreMtserModel storeMtser = new StoreMtserModel();
+					storeMtser.set("s_id", store.getInt("id"))
+					.set("ms_id", Integer.valueOf(mid)).save();
+				}
 			}
+			//{"status":0,"id":945969865,"message":"\u6210\u529f"}
+			String json = BaiDuLBSTool.createPoi(store.getStr("name"), "", "", store.getDouble("lat"), store.getDouble("lon"), BaiDuLBSTool.GEOID, BaiDuLBSTool.AK, store.getInt("id"));
+			Integer lbsid = JSONObject.parseObject(json).getInteger("id");
+			store.set("lbs_id", lbsid).update();
 			result.put(RESULT, true);
 			result.put(MESSAGE, "Store添加成功！");
 		} catch (Exception e) {
@@ -109,20 +119,29 @@ public class StoreController extends BaseController {
 
 			// 图片文件id
 			String fsStr = getPara("fs");
-			String[] fs = fsStr.split("\\|");
-			for (String fid : fs) {
-				StorePicModel storePic = new StorePicModel();
-				storePic.set("s_id", store.getInt("id"))
-						.set("f_id", Integer.valueOf(fid)).save();
+			if(StrKit.notBlank(fsStr)){
+				String[] fs = fsStr.split("\\|");
+				for (String fid : fs) {
+					StorePicModel storePic = new StorePicModel();
+					storePic.set("s_id", store.getInt("id"))
+					.set("f_id", Integer.valueOf(fid)).save();
+				}
 			}
 			Map<String, String[]> paraMap = getParaMap();
 			// 服务类型
 			String[] ms = paraMap.get("ms");
-			for (String mid : ms) {
-				StoreMtserModel storeMtser = new StoreMtserModel();
-				storeMtser.set("s_id", store.getInt("id"))
-						.set("ms_id", Integer.valueOf(mid)).save();
+			if(null!=ms){
+				for (String mid : ms) {
+					StoreMtserModel storeMtser = new StoreMtserModel();
+					storeMtser.set("s_id", store.getInt("id"))
+					.set("ms_id", Integer.valueOf(mid)).save();
+				}
 			}
+			
+			Integer lbsid = StoreModel.dao.findById(store.getInt("id")).getInt("lbs_id");
+			String updatePoi = BaiDuLBSTool.updatePoi(BaiDuLBSTool.GEOID, BaiDuLBSTool.AK, store.getStr("name"), "", "", store.getDouble("lat"), store.getDouble("lon"), lbsid);
+			System.out.println(updatePoi);
+			
 			result.put(RESULT, true);
 			result.put(MESSAGE, "Store更新成功！");
 		} catch (Exception e) {
@@ -182,6 +201,8 @@ public class StoreController extends BaseController {
 			for (String id : ids) {
 				Integer s_id = Integer.valueOf(id);
 				StoreMtserModel.dao.delBySid(s_id);
+				String deletePoi = BaiDuLBSTool.deletePoi(BaiDuLBSTool.GEOID, BaiDuLBSTool.AK, StoreModel.dao.findById(s_id).getInt("lbs_id"));
+				System.out.println(deletePoi);
 			}
 
 			StoreModel.dao.batchDel(getPara("ids"));
@@ -205,5 +226,11 @@ public class StoreController extends BaseController {
 		result.put(MESSAGE, b ? "保存成功" : "保存失败，请联系管理员！");
 		renderJson(result);
 	}
+	
+	public void getAll(){
+		List<StoreModel> data = StoreModel.dao.getAll2();
+		renderJson(data);
+	}
+	
 
 }

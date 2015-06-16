@@ -15,7 +15,7 @@ public class OilModelModel extends Model<OilModelModel> {
 	public static final OilModelModel dao = new OilModelModel();
 
 	public OilModelModel findByName(String name){
-		return this.findFirst("select * from oil_brand where name=?", name);
+		return this.findFirst("select * from oil_model where name=?", name);
 	}
 	
 	public List<OilModelModel> getAllByBid(Integer bid) {

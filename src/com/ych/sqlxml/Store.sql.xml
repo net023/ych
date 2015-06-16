@@ -6,7 +6,7 @@
 		<![CDATA[ 
 			from(
 				select t1.*,t2.fs,t3.ms from(
-					select id,`status`,`name`,address,info,lon,lat,c_time,province,city,county,username,qfc from store where 1=1
+					select id,`status`,`name`,address,info,lon,lat,c_time,province,city,county,username,qfc,contact,phone from store where 1=1
 					<% if(!isEmpty(storeName)){ %>
 					 AND name like #'%$storeName$%'#
 					<% } %>

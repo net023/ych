@@ -28,12 +28,14 @@ import com.ych.tools.ModelTools;
 import com.ych.tools.SysConstants;
 import com.ych.tools.excel.XxlsPrint;
 import com.ych.web.model.FileModel;
+import com.ych.web.model.FilterPriceModel;
 import com.ych.web.model.OilBrandModel;
 import com.ych.web.model.OilEtalonModel;
 import com.ych.web.model.OilModel;
 import com.ych.web.model.OilModelModel;
 import com.ych.web.model.OilPicModel;
 import com.ych.web.model.OilPriceModel;
+import com.ych.web.model.StoreModel;
 
 @Control(controllerKey = "/oil")
 public class OilController extends BaseController {
@@ -219,8 +221,8 @@ public class OilController extends BaseController {
 	@Before(Tx.class)
 	public void batchEdit(){
 		Map<String, Object> result = getResultMap();
-		OutputStreamWriter ow = null;
-		BufferedWriter bw = null;
+//		OutputStreamWriter ow = null;
+//		BufferedWriter bw = null;
 		try {
 			File excelFile = getFile("scslb", SysConstants.IMG_DIR, SysConstants.MAX_POST_SIZE).getFile();
 			
@@ -229,32 +231,64 @@ public class OilController extends BaseController {
 			howto.processOneSheet(absolutePath, 1);
 			List<List> data = howto.getMsg();
 			List<String> row = null;
-			File tempFile = File.createTempFile("上传结果_"+System.currentTimeMillis()/1000, ".txt", new File(SysConstants.IMG_DIR));
-			ow = new OutputStreamWriter(new FileOutputStream(tempFile), "UTF-8");
-			bw = new BufferedWriter(ow);
+//			File tempFile = File.createTempFile("上传结果_"+System.currentTimeMillis()/1000, ".txt", new File(SysConstants.IMG_DIR));
+//			ow = new OutputStreamWriter(new FileOutputStream(tempFile), "UTF-8");
+//			bw = new BufferedWriter(ow);
 			for (int i = 1; i < data.size(); i++) {
 				row = data.get(i);
-				String productNum = row.get(0);
-				String priceStr = row.get(1);
-				if(StrKit.notBlank(productNum,priceStr)){
+				String brand = row.get(0);
+				String modelStr = row.get(1);
+				String type = row.get(2);
+				String etalon = row.get(3);
+				String litre = row.get(4);
+				String priceStr = row.get(6);
+				
+				Integer b_id = OilBrandModel.dao.findByName(brand).getInt("id");
+				Integer m_id = OilModelModel.dao.findByName(modelStr).getInt("id");
+				Integer t_id = 1;
+				if(type.equals("全合成")){
+					t_id = 1;
+				}else if(type.equals("半合成")){
+					t_id = 2;
+				}else{
+					t_id = 3;
+				}
+				Integer e_id = OilEtalonModel.dao.getModelByName(etalon).getInt("id");
+				Integer l_id = 1;
+				if(litre.equals("1L装")){
+					l_id = 1;
+				}else{
+					l_id = 2;
+				}
+				BigDecimal price = new BigDecimal(priceStr);
+				OilPriceModel model = OilPriceModel.dao.getModelByBMETL(b_id, m_id, e_id, t_id, l_id);
+				if(null!=model){
+					model.set("price", price).update();
+				}else{
+					new OilPriceModel().set("b_id", b_id).set("m_id", m_id).set("e_id", e_id).set("type", t_id).set("litre", l_id).set("price", price).save();
+				}
+				
+				
+				/*if(StrKit.notBlank(productNum,priceStr)){
 					BigDecimal price = new BigDecimal(priceStr);
 					boolean isUP = OilModel.dao.updatePriceByName(price, productNum);
 					if(!isUP){
 						bw.write(productNum+"	数据库中不存在");
 						bw.newLine();
 					}
-				}
+				}*/
 			}
 			
 			result.put(RESULT, true);
-			result.put("f", tempFile.getName());
+//			result.put("f", tempFile.getName());
 			result.put(MESSAGE, "上传成功！");
 		} catch (Exception e) {
 			e.printStackTrace();
 			LOG.debug("文件上传失败！" + e.getMessage());
 			result.put(RESULT, false);
 			result.put(MESSAGE, "上传失败！");
-		}finally{
+		}
+		/*finally{
 			try {
 				if(null!=bw){
 					bw.close();
@@ -262,7 +296,7 @@ public class OilController extends BaseController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
+		}*/
 		render(new JsonRender(result).forIE());
 	}
 	

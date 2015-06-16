@@ -223,15 +223,15 @@ $(function() {
 			layer.close(ii);
 			if(result.result.r){
 				$("#priceMgGrid").datagrid('reload');
-				var fileName = encodeURIComponent(encodeURIComponent(result.result.f));
+				/*var fileName = encodeURIComponent(encodeURIComponent(result.result.f));
 				asyncbox.open({
 					title:result.result.m,
 					//html:"<a href='file/df?fn="+result.result.f+"' target='_blank'>点击下载上传结果信息</a>",
 					html:'<a href="#" onclick="javascript:(window.open(\'file/df2?fn='+fileName+'\'))">点击下载上传结果信息</a>',
 					width : 200,
 					height : 200
-				});
-//				$.messager.alert("上传完成",result.result.m);
+				});*/
+				$.messager.alert("上传完成",result.result.m);
 			}else{
 				$.messager.alert("上传失败",result.result.m);
 			}
