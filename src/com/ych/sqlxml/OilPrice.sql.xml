@@ -5,7 +5,7 @@
 	<sql id="pager">
 		<![CDATA[
 			from(
-				select t1.id,t1.`type`,t1.price,t1.`status`,t1.recmd,t2.name 'etalon',t3.name 'brand',t4.name 'model' from (
+				select t1.id,t1.`type`,t1.price,t1.`status`,t1.recmd,t1.litre,t2.name 'etalon',t3.name 'brand',t4.name 'model' from (
 					select * from oil_price where 1=1
 					<% if(!isEmpty(type)){ %>
 					 AND `type` = #$type$#
@@ -24,6 +24,9 @@
 					<% } %>
 					<% if(!isEmpty(recmd)){ %>
 					 AND `recmd` = #$recmd$#
+					<% } %>
+					<% if(!isEmpty(litre)){ %>
+					 AND `litre` = #$litre$#
 					<% } %>
 				)t1
 				LEFT JOIN oil_etalon t2 on t2.id = t1.e_id

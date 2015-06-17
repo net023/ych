@@ -50,6 +50,21 @@ var formatter = {
 	 edit: function(value,rowData,rowIndex){
 		 return '<a class="spacing a-blue" onclick="edit('+rowIndex+');" href="javascript:void(0);">修改预约时间</a>';
 	 },
+	 type:function(value,rowData,rowIndex){
+		 var arr = value.split(",");
+		 var types = {
+					1:'机油滤清器',
+					2:'空气滤清器',
+					3:'空调滤清器',
+					4:'燃油滤清器',
+					5:'机油'
+			};
+		 var result = "";
+		 for(var i in arr){
+			 result+=types[arr[i]]+" | ";
+		 }
+		 return result;
+	 },
 	 state:function(value,rowData,rowIndex){
 		var states = {
 				0:'新增',

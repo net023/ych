@@ -85,7 +85,6 @@
                 <th data-options="field:'type',width:80,resizable:true,align:'left',formatter:formatter.type">类型</th>
                 <th data-options="field:'etalon',width:80,resizable:true,align:'left'">粘度(规格)</th>
                 <th data-options="field:'ly_id',width:80,resizable:true,align:'left'">力洋ID</th>
-                <th data-options="field:'price',width:80,resizable:true,align:'left'">价格</th>
                 <th data-options="field:'fill',width:80,resizable:true,align:'left'">加注量</th>
                 <th data-options="field:'brand',width:80,resizable:true,align:'left'">厂商</th>
                 <th data-options="field:'model',width:80,resizable:true,align:'left'">型号</th>
@@ -260,6 +259,16 @@
 							        data:[{id:'',name:'全部'},{id:0,name:'推荐'},{id:1,name:'不推荐'}]"
 							        style="width: 155px;">
 	                		</span>
+	                		<span class="spacing">
+	                			<label>升数：</label>
+		                		<input id="litre" name="litre" class="easyui-combobox" data-options="
+									editable:false,
+									required:false,
+							        valueField:'id',
+							        textField:'name',
+							        data:[{id:'',name:'全部'},{id:1,name:'1L'},{id:2,name:'4L'}]"
+							        style="width: 155px;">
+	                		</span>
 			                <span class="spacing">
 			                	<input type="submit" id="priceQueryButton" value="查询"/>
 			                </span>
@@ -282,6 +291,7 @@
 	                <th data-options="field:'type',width:80,resizable:true,align:'left',formatter:formatter.type">类型</th>
 	                <th data-options="field:'etalon',width:80,resizable:true,align:'left'">粘度(规格)</th>
 	                <th data-options="field:'price',width:80,resizable:true,align:'left'">价格</th>
+	                <th data-options="field:'litre',width:80,resizable:true,align:'left',formatter:formatter.litre">升数</th>
 	                <th data-options="field:'brand',width:80,resizable:true,align:'left'">品牌</th>
 	                <th data-options="field:'model',width:80,resizable:true,align:'left'">型号</th>
 	                <th data-options="field:'status',width:160,resizable:true,align:'left',formatter:formatter.status">状态</th>

@@ -285,6 +285,13 @@ var formatter = {
 	editPrice:function(value,rowData,rowIndex){
 		return '<a class="spacing a-blue" onclick="editPrice('+rowIndex+');" href="javascript:void(0);">修改价格</a>';
 	},
+	litre:function(value,rowData,rowIndex){
+		if(value==1){
+			return "1L";
+		}else{
+			return "4L";
+		}
+	},
 	type:function(value,rowData,rowIndex){
 		if(value==1){
 			return "全合成";

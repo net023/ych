@@ -58,14 +58,15 @@
         
 		 <table id="grid" data-options="rownumbers:true,pagination:true,url:'order/list'" title="订单管理">
 			 <thead>
-				 <th data-options="field:'id',width:60,resizable:true,align:'left'">订单号</th>
-				 <th data-options="field:'ms',width:160,resizable:true,align:'left'">保养项目</th>
+				 <th data-options="field:'id',width:50,resizable:true,align:'left'">订单号</th>
+				 <th data-options="field:'ms',width:80,resizable:true,align:'left'">保养类型</th>
+				 <th data-options="field:'type',width:200,resizable:true,align:'left',formatter:formatter.type">保养项目</th>
 				 <th data-options="field:'fs',width:200,resizable:true,align:'left',formatter:formatter.img">配件</th>
-				 <th data-options="field:'price',width:80,resizable:true,align:'left'">总价格</th>
+				 <th data-options="field:'price',width:60,resizable:true,align:'left'">总价格</th>
 				 <th data-options="field:'name',width:80,resizable:true,align:'left'">微信昵称</th>
 				 <th data-options="field:'phone',width:80,resizable:true,align:'left'">手机</th>
 				 <th data-options="field:'res_time',width:90,resizable:true,align:'left'">预约时间</th>
-				 <th data-options="field:'store',width:80,resizable:true,align:'left'">门店</th>
+				 <th data-options="field:'store',width:100,resizable:true,align:'left'">门店</th>
 				 <th data-options="field:'edit',width:80,resizable:true,align:'left',formatter:formatter.edit">修改预约时间</th>
 				 <th data-options="field:'status',width:40,resizable:true,align:'left',formatter:formatter.state">状态</th>
 				 <th data-options="field:'opt',width:100,resizable:true,align:'left',formatter:formatter.opt">操作</th>

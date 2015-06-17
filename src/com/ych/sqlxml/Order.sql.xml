@@ -5,7 +5,7 @@
 	<sql id="pager">
 		<![CDATA[ 
 			FROM ( 
-				select t1.id,t1.res_time,t1.`status`,t2.phone,t2.name,t3.price,t3.fs,t4.`name` ms,t5.name 'store' from (
+				select t1.id,t1.res_time,t1.`status`,t2.phone,t2.name,t3.price,t3.fs,t3.type,t4.`name` ms,t5.name 'store' from (
 					select id,b_id,`status`,res_time,wx_id,ms_id from `order` where 1=1
 					<% if(!isEmpty(startDate)){ %>
 						AND res_time>=#'$startDate$'#
@@ -30,10 +30,10 @@
 					<% } %>
 				)t2 on t2.id = t1.wx_id
 				left join(
-					select o_id,sum(pp) price,group_concat(fs) fs from (
-						select t1.o_id,
-							case t1.type WHEN 1 THEN t2.price*t1.n ELSE t3.price*t1.n END AS 'pp',
-							case t1.type WHEN 1 THEN t4.p_id ELSE t5.p_id END AS 'fs'
+					select o_id,sum(pp) price,group_concat(fs) fs,group_concat(type) type from (
+						select t1.o_id,t1.type,
+							case WHEN t1.type in(1,2,3,4) THEN t2.price*t1.n ELSE t3.price*t1.n END AS 'pp',
+							case WHEN t1.type in(1,2,3,4) THEN t4.p_id ELSE t5.p_id END AS 'fs'
 						from (
 							select o_id,c_id,sum(num) n,type from order_commodity group by o_id,c_id,type
 						)t1

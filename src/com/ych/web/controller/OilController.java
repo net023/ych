@@ -61,6 +61,7 @@ public class OilController extends BaseController {
 		pager.addParam("model", getParaToInt("model"));
 		pager.addParam("status", getParaToInt("status"));
 		pager.addParam("recmd", getParaToInt("recmd"));
+		pager.addParam("litre", getParaToInt("litre"));
 		
 		Page<?> page = OilPriceModel.dao.getPager(pager);
 		setAttr("total", page.getTotalRow());

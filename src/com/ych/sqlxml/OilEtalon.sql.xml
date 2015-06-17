@@ -5,7 +5,7 @@
 	<sql id="getEtalon">
 		<![CDATA[
 			select t2.id,t2.`name` from (
-				select e_id from oil_price where b_id=? and m_id=?
+				select e_id from oil_price where b_id=? and m_id=? group by e_id
 			)t1
 			left join oil_etalon t2 on t2.id = t1.e_id
 		]]>
