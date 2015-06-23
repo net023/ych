@@ -18,7 +18,6 @@ import com.ych.base.common.MyBeetlRenderFactory;
 import com.ych.base.interceptor.LoginInterceptor;
 import com.ych.core.plugin.annotation.ControlPlugin;
 import com.ych.core.plugin.annotation.TablePlugin;
-import com.ych.core.plugin.quartz.QuartzPlugin;
 import com.ych.core.plugin.sqlinxml.SqlXmlPlugin;
 import com.ych.tools.DevConstants;
 
