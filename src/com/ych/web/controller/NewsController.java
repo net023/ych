@@ -1,11 +1,13 @@
 package com.ych.web.controller;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -58,11 +60,24 @@ public class NewsController extends BaseController {
 	public void add() {
 		Map<String, Object> result = getResultMap();
 		try {
-			String html = getPara("n_content");
+			String html = getPara("b_content");
 			Document doc = Jsoup.parseBodyFragment(html);
+			/*System.out.println("1"+doc.baseUri());
+			System.out.println("2"+doc.html());
+			System.out.println("3"+doc.location());
+			System.out.println("4"+doc.nodeName());
+			System.out.println("5"+doc.outerHtml());
+			System.out.println("6"+doc.ownText());
+			System.out.println("7"+doc.text());
+			System.out.println("8"+doc.title());
+			System.out.println("9"+doc.toString());
+			System.out.println("10"+doc.val());*/
+			Document doc2 = Jsoup.parseBodyFragment(html);
 			Elements imgs = doc.select("img");
+			Elements imgs2 = doc2.select("img");
 			System.out.println(imgs.size());
 			for (Element ele : imgs) {
+				ele.attr("src", SysConstants.IMGPRE+ele.attr("src"));
 				if(ele.attr("src").indexOf("emot")==-1){
 					if("".equals(ele.attr("width"))){
 						ele.attr("width", "80");
@@ -74,8 +89,19 @@ public class NewsController extends BaseController {
 				}
 			}
 			
+			for (Element ele : imgs2) {
+				if(ele.attr("src").indexOf("emot")==-1){
+					if("".equals(ele.attr("width"))){
+						ele.attr("width", "80");
+					}
+					if("".equals(ele.attr("height"))){
+						ele.attr("height","80");
+					}
+				}
+			}
+			
 			new NewsModel().set("n_title", getPara("n_title")).set("n_content", doc.body().html()).set("n_type", getParaToInt("n_type"))
-				.set("c_time", new Date()).save();
+				.set("c_time", new Date()).set("b_content", doc2.body().html()).save();
 			result.put(RESULT, true);
 			result.put(MESSAGE, "news添加成功！");
 		} catch (Exception e) {
@@ -94,14 +120,17 @@ public class NewsController extends BaseController {
 			Integer id = getParaToInt("id");
 			NewsModel qm = NewsModel.dao.findById(id);
 			
-			String html = getPara("n_content");
+			String html = getPara("b_content");
 			
-			delIMgHandler(qm.getStr("n_content"), html);
+			delIMgHandler(qm.getStr("b_content"), html);
 			
 			Document doc = Jsoup.parseBodyFragment(html);
+			Document doc2 = Jsoup.parseBodyFragment(html);
 			Elements imgs = doc.select("img");
+			Elements imgs2 = doc2.select("img");
 			System.out.println(imgs.size());
 			for (Element ele : imgs) {
+				ele.attr("src", SysConstants.IMGPRE+ele.attr("src"));
 				if(ele.attr("src").indexOf("emot")==-1){
 					if("".equals(ele.attr("width"))){
 						ele.attr("width", "80");
@@ -112,8 +141,18 @@ public class NewsController extends BaseController {
 					System.out.println(ele.attr("width")+"----------"+ele.attr("height"));
 				}
 			}
+			for (Element ele : imgs2) {
+				if(ele.attr("src").indexOf("emot")==-1){
+					if("".equals(ele.attr("width"))){
+						ele.attr("width", "80");
+					}
+					if("".equals(ele.attr("height"))){
+						ele.attr("height","80");
+					}
+				}
+			}
 			
-			qm.set("n_title", getPara("n_title")).set("n_content", doc.body().html()).set("n_type", getParaToInt("n_type")).update();
+			qm.set("n_title", getPara("n_title")).set("n_content", doc.body().html()).set("n_type", getParaToInt("n_type")).set("b_content", doc2.body().html()).update();
 			
 			result.put(RESULT, true);
 			result.put(MESSAGE, "news更新成功！");
@@ -155,6 +194,14 @@ public class NewsController extends BaseController {
 			String rootRealPath = this.getRequest().getServletContext().getRealPath("/");
 			for (String img : temp_old_src) {
 				FileKit.delete(new File(rootRealPath,img));
+				try {
+					//删除微信项目下的图片
+					File rootFile = new File(rootRealPath);
+					String ych_wx_path = rootFile.getParentFile().getCanonicalPath()+SysConstants.YCH_WX;
+					FileKit.delete(new File(ych_wx_path,img));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}
@@ -168,13 +215,17 @@ public class NewsController extends BaseController {
 			String rootRealPath = this.getRequest().getServletContext().getRealPath("/");
 			String[] ids = getPara("ids").split("\\|");
 			for (String idStr : ids) {
-				String content = NewsModel.dao.findById(Integer.valueOf(idStr)).getStr("n_content");
+				String content = NewsModel.dao.findById(Integer.valueOf(idStr)).getStr("b_content");
 				Document doc = Jsoup.parseBodyFragment(content);
 				Elements imgs = doc.select("img");
 				for (Element img : imgs) {
 					if(img.attr("src").indexOf("emot")==-1){
 						String src = img.attr("src");
 						FileKit.delete(new File(rootRealPath,src));
+						//删除微信项目下的图片
+						File rootFile = new File(rootRealPath);
+						String ych_wx_path = rootFile.getParentFile().getCanonicalPath()+SysConstants.YCH_WX;
+						FileKit.delete(new File(ych_wx_path,src));
 					}
 				}
 			}
@@ -207,9 +258,28 @@ public class NewsController extends BaseController {
 		try {
 			//imgs
 			String imgPath = this.getRequest().getServletContext().getRealPath("/imgs");
+//			System.out.println(getRequest().getServletPath());
+//			System.out.println(getRequest().getServletContext().getRealPath("/"));
+			String root = getRequest().getServletContext().getRealPath("/");
+			File rootFile = new File(root);
+//			System.out.println(rootFile.getParent());
+//			System.out.println(rootFile.getParentFile().getAbsolutePath());
+//			System.out.println(rootFile.getParentFile().getCanonicalPath());
+//			System.out.println(rootFile.getParentFile().getName());
+//			System.out.println(rootFile.getParentFile().getPath());
+			String ych_wx_path = rootFile.getParentFile().getCanonicalPath()+SysConstants.YCH_WX+"/imgs/";
+			
+			
+			
+//			System.out.println(getRequest().getServletContext().getRealPath(""));
+//			System.out.println(this.getClass().getResource("/"));
+//			System.out.println(this.getClass().getClassLoader().getResource("/").getPath());
+//			System.out.println(System.getProperty("user.dir"));
 			UploadFile upload = getFile("filedata", imgPath, SysConstants.MAX_POST_SIZE);
 			String fileName = upload.getOriginalFileName();
 			String newFileName = DateTools.format(new Date(), DateTools.yyyyMMddHHmmssSSS) + fileName.substring(fileName.lastIndexOf("."), fileName.length());
+			
+			FileUtils.copyFile(upload.getFile(), new File(ych_wx_path+newFileName));
 			upload.getFile().renameTo(new File(imgPath+ File.separator + newFileName));
 			
 			result.put("err", "");
@@ -229,6 +299,10 @@ public class NewsController extends BaseController {
 	
 	public void upimgByIframe(){
 		render("news/uploadgui");
+	}
+	
+	public static void main(String[] args) {
+		System.out.println(System.getProperty("user.dir"));
 	}
 	
 }

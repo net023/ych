@@ -100,7 +100,7 @@ function edit(rowIndex){
 	$('#newsForm').attr('action','news/update').resetForm();
     var data = $('#grid').datagrid('getRows')[rowIndex];
     $('#newsForm')._jsonToForm(data);
-    $("#answer").html(data.n_content);
+    $("#answer").html(data.b_content);
     $("#type").combobox("select",data.n_type);
     $('#newsDialog').dialog('open').dialog('setTitle','修改');
 }

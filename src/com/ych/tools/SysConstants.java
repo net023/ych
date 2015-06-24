@@ -116,5 +116,16 @@ public class SysConstants {
 	public static final  String ALIPAY_NOTIFY_URL = "ALIPAY_NOTIFY_URL";
 	
 	
+	/**
+	 * 文章图片路径前缀
+	 */
+	public static final String IMGPRE = prop.get("img.pre");
+	
+	/**
+	 * 微信项目名称
+	 */
+	public static final String YCH_WX = prop.get("ych.wx");
+	
+	
 	
 }
